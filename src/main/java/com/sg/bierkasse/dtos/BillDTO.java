@@ -34,6 +34,10 @@ public record BillDTO(
         return Utils.formatDoubleToEuro(value);
     }
 
+    public boolean isConsumptionBill(){
+        return red > 0 || blue > 0 || white > 0 || green > 0;
+    }
+
     public int compareTo(Date other){
         return this.date.compareTo(other);
     }

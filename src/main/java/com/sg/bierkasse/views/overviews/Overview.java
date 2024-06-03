@@ -1,4 +1,4 @@
-package com.sg.bierkasse.views.overview;
+package com.sg.bierkasse.views.overviews;
 
 import java.util.ArrayList;
 import java.util.List;

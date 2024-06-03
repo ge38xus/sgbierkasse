@@ -55,6 +55,17 @@ public class EmailService {
         }
     }
 
+    public void sendMail(PersonDTO personDTO, EmailTemplates emailTemplate) {
+        try {
+            if (!personDTO.getEmail().isEmpty()) {
+                Message message = prepareMessage(session, myAccount, personDTO, null, emailTemplate);
+                Transport.send(message); // E-Mail senden!
+            }
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
     private static Message prepareMessage(
             Session session, String myAccount, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws Exception{
         Message message = new MimeMessage(session);
@@ -84,6 +95,14 @@ public class EmailService {
         messageBodyPart.setDataHandler(new DataHandler(fds));
         messageBodyPart.setHeader("Content-ID", "paypal");
         multipart.addBodyPart(messageBodyPart);
+
+        if (emailTemplate == EmailTemplates.BERICHT) {
+            messageBodyPart = new MimeBodyPart();
+            fds = new FileDataSource("./Bierkassenbericht.pdf");
+            messageBodyPart.setDataHandler(new DataHandler(fds));
+            messageBodyPart.setFileName("Bierkassenbericht.pdf");
+            multipart.addBodyPart(messageBodyPart);
+        }
 
         message.setContent(multipart);
 

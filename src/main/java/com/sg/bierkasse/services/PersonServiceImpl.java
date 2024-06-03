@@ -3,11 +3,13 @@ package com.sg.bierkasse.services;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.RechnungDTO;
+import com.sg.bierkasse.dtos.SpendeDTO;
 import com.sg.bierkasse.repositories.MongoDBPersonRepo;
 import com.sg.bierkasse.utils.EmailTemplates;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonServiceImpl implements EntityService<PersonDTO> {
@@ -93,19 +95,39 @@ public class PersonServiceImpl implements EntityService<PersonDTO> {
         }
     }
 
-    public double calculateAllMinusAccounts() {
-        return this.findAll().stream()
-                .map(PersonDTO::getBalance)
-                .filter(o -> o < 0)
-                .reduce((Double::sum))
-                .orElse(0.0);
+//    public void pushSpende(PersonDTO personDTO, SpendeDTO spendeDTO) {
+////        entityRepository.pushSpende(personDTO.toPersonEntity(), spendeDTO.toSpendeEntity());
+//    }
+
+    public void paySpende(SpendeDTO spende) {
+
     }
 
-    public double calculateAllPlusAccounts() {
+    public List<RechnungDTO> getAllRechnungDTOs(){
         return this.findAll().stream()
-                .map(PersonDTO::getBalance)
-                .filter(o -> o > 0)
-                .reduce((Double::sum))
-                .orElse(0.0);
+                .map(PersonDTO::getInvoices)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    public List<BillDTO> getAllBills(){
+        return this.findAll().stream()
+                .map(PersonDTO::getBills)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    public List<SpendeDTO> getAllSpenden(){
+        return this.findAll().stream()
+                .map(PersonDTO::getSpenden)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+    }
+
+    public void sendEmailToActiven() {
+        emailService.sendMail(this.findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
+
+        this.findAll().stream().filter(PersonDTO::isNotAH).filter(PersonDTO::isExcelRelevant).forEach( o -> emailService.sendMail(o, EmailTemplates.BERICHT));
     }
 }

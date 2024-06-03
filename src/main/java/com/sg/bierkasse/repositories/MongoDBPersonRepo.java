@@ -140,4 +140,10 @@ public class MongoDBPersonRepo implements EntityRepo<PersonEntity> {
         Bson change = push("rechnungEntities", rechnungEntity);
         personCollection.updateOne(filter, change);
     }
+
+//    public void pushSpende(PersonEntity personEntity, SpendeEntity spendeEntity) {
+//        Bson filter = eq("_id", personEntity.getId());
+//        Bson change = push("spendeEntities", spendeEntity);
+//        personCollection.updateOne(filter, change);
+//    }
 }

@@ -1,4 +1,4 @@
-package com.sg.bierkasse.views.bills;
+package com.sg.bierkasse.views.overviews;
 
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;

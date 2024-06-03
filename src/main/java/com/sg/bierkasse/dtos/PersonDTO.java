@@ -1,11 +1,15 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.PersonEntity;
+import com.sg.bierkasse.utils.UserState;
 import com.sg.bierkasse.utils.Utils;
 import org.bson.types.ObjectId;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.ToIntFunction;
 
 
 public class PersonDTO {
@@ -16,8 +20,10 @@ public class PersonDTO {
         String state;
         List<BillDTO> bills;
         List<RechnungDTO> invoices;
+        List<SpendeDTO> spenden;
 
         boolean excelRelevant;
+        boolean berichtReceiver;
 
 
 
@@ -29,7 +35,9 @@ public class PersonDTO {
         this.state = p.getState();
         this.bills = p.getBillEntities().stream().map(BillDTO::new).toList();
         this.invoices = p.getRechnungEntities().stream().map(RechnungDTO::new).toList();
+//        this.spenden = p.getSpendeEntities().stream().map(SpendeDTO::new).toList();
         this.excelRelevant = p.isExcelRelevant();
+        this.berichtReceiver = p.isBerichtReceiver();
     }
 
     public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, Boolean excelRelevant) {
@@ -111,12 +119,30 @@ public class PersonDTO {
         this.excelRelevant = excelRelevant;
     }
 
+    public List<SpendeDTO> getSpenden() {
+        return spenden;
+    }
+
+    public void setSpenden(List<SpendeDTO> spenden) {
+        this.spenden = spenden;
+    }
+
+    public boolean isBerichtReceiver() {
+        return berichtReceiver;
+    }
+
+    public void setBerichtReceiver(boolean berichtReceiver) {
+        this.berichtReceiver = berichtReceiver;
+    }
+
     public PersonEntity toPersonEntity() {
         ObjectId _id = id == null ? new ObjectId() : new ObjectId(id);
         return new PersonEntity(_id, firstName, lastName, email, state,
                 bills.stream().map(BillDTO::toBillEntity).toList(),
                 invoices.stream().map(RechnungDTO::toRechnungEntity).toList(),
-                excelRelevant);
+//                spenden.stream().map(SpendeDTO::toSpendeEntity).toList(),
+                excelRelevant, berichtReceiver
+        );
     }
 
     public double getBalance() {
@@ -130,7 +156,7 @@ public class PersonDTO {
         return Utils.formatDoubleToEuro(getBalance());
     }
     public int compareTo(PersonDTO other) {
-        int i = state.compareTo(other.state);
+        int i = UserState.valueOf(state).compareTo(UserState.valueOf(other.state));
         if (i != 0) return i;
 
         return lastName.compareTo(other.lastName);
@@ -162,5 +188,16 @@ public class PersonDTO {
            }
         }
         return " - ";
+    }
+
+    public int getNoOfXSince(Date conventDate, ToIntFunction<BillDTO> billDTOToIntFunction) {
+        return this.getBills().stream()
+                .filter(billDTO -> billDTO.date().after(conventDate))
+                .mapToInt(billDTOToIntFunction)
+                .sum();
+    }
+
+    public boolean isNotAH() {
+        return Objects.equals(this.state, UserState.AH.name);
     }
 }

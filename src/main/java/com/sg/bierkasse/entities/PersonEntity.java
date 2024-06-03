@@ -16,7 +16,11 @@ public class PersonEntity {
 
     private List<RechnungEntity> rechnungEntities;
 
+//    private List<SpendeEntity> spendeEntities;
+
     private boolean excelRelevant;
+
+    private boolean berichtReceiver;
 
     public PersonEntity() {
 
@@ -29,7 +33,10 @@ public class PersonEntity {
                         String state,
                         List<BillEntity> billEntities,
                         List<RechnungEntity> rechnungEntities,
-                        boolean excelRelevant) {
+//                        List<SpendeEntity> spendeEntities,
+                        boolean excelRelevant,
+                        boolean berichtReceiver
+        ) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,7 +44,9 @@ public class PersonEntity {
         this.state = state;
         this.billEntities = billEntities;
         this.rechnungEntities = rechnungEntities;
+//        this.spendeEntities = spendeEntities;
         this.excelRelevant = excelRelevant;
+        this.berichtReceiver = berichtReceiver;
     }
 
     public ObjectId getId() {
@@ -110,6 +119,22 @@ public class PersonEntity {
         this.excelRelevant = excelRelevant;
     }
 
+//    public List<SpendeEntity> getSpendeEntities() {
+//        return spendeEntities;
+//    }
+
+//    public void setSpendeEntities(List<SpendeEntity> spendeEntities) {
+//        this.spendeEntities = spendeEntities;
+//    }
+
+    public boolean isBerichtReceiver() {
+        return berichtReceiver;
+    }
+
+    public void setBerichtReceiver(boolean berichtReceiver) {
+        this.berichtReceiver = berichtReceiver;
+    }
+
     @Override
     public String toString() {
         return "Person{" + "id=" + id + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email=" + '\'' + email + '\'' + ", state=" + '\'' + state + '\'' + ", bills=" + billEntities + ", excelRelevant=" + excelRelevant + "}";
@@ -120,11 +145,29 @@ public class PersonEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PersonEntity that = (PersonEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(email, that.email) && Objects.equals(state, that.state) && Objects.equals(billEntities, that.billEntities);
+        return excelRelevant == that.excelRelevant &&
+                berichtReceiver == that.berichtReceiver &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(billEntities, that.billEntities) &&
+                Objects.equals(rechnungEntities, that.rechnungEntities); //&&
+//                Objects.equals(spendeEntities, that.spendeEntities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email, state, billEntities);
+        return Objects.hash(id,
+                firstName,
+                lastName,
+                email,
+                state,
+                billEntities,
+                rechnungEntities,
+//                spendeEntities,
+                excelRelevant,
+                berichtReceiver);
     }
 }

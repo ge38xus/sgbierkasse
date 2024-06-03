@@ -1,14 +1,14 @@
-package com.sg.bierkasse.views.invoices;
+package com.sg.bierkasse.views.overviews;
 
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.dtos.RechnungDTO;
+import com.sg.bierkasse.dtos.SpendeDTO;
 import com.sg.bierkasse.services.PersonServiceImpl;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
@@ -20,44 +20,47 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
-@PageTitle("Rechnungen")
-@Route(value = "invoices", layout = MainLayout.class)
+@PageTitle("Spenden")
+@Route(value = "spenden", layout = MainLayout.class)
 @Uses(Icon.class)
-public class RechnungView extends Composite<VerticalLayout> {
+public class SpendeView extends Composite<VerticalLayout> {
 
     PersonServiceImpl personService;
 
-    public RechnungView(PersonServiceImpl personService) {
+    public SpendeView(PersonServiceImpl personService) {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 
         this.personService = personService;
 
-        Grid<RechnungDTO> grid = new Grid<>(RechnungDTO.class, false);
-        grid.addColumn(RechnungDTO::formattedDate).setHeader("Datum");
-        grid.addColumn(RechnungDTO::formattedValue).setHeader("Summe");
-        grid.addColumn(RechnungDTO::description).setHeader("Beschreibung");
-        grid.addColumn(RechnungDTO::privateMoneyUsed).setHeader("Selbst Bezahlt?");
+        Grid<SpendeDTO> grid = new Grid<>(SpendeDTO.class, false);
+        grid.addColumn(SpendeDTO::formattedDate).setHeader("Datum");
+        grid.addColumn(SpendeDTO::formattedValue).setHeader("Summe");
+        grid.addColumn(SpendeDTO::formattedDatePayedOn).setHeader("Eingezahlt am");
+        grid.addColumn(SpendeDTO::occasion).setHeader("Beschreibung");
+        grid.addColumn(
+                new ComponentRenderer<>(Button::new, (button, spende) -> {
+                    button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+                            ButtonVariant.LUMO_SUCCESS,
+                            ButtonVariant.LUMO_TERTIARY);
+                    button.addClickListener(e -> personService.paySpende(spende));
+                })).setHeader("Payed");
 
         grid.setItems(
-                personService.findAll().stream()
-                        .map(PersonDTO::getInvoices)
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList())
+                personService.getAllSpenden()
         );
 
         ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
 
-        DatePicker datePicker = new DatePicker("Rechnungsdatum");
+        DatePicker datePicker = new DatePicker("SpendeDatum");
         datePicker.setLocale(new Locale("de", "DE"));
         datePicker.setVisible(false);
         NumberField numberField = new NumberField("Summe");
@@ -65,33 +68,30 @@ public class RechnungView extends Composite<VerticalLayout> {
         TextField descriptionField = new TextField("Beschreibung");
         descriptionField.setWidth("200%");
         descriptionField.setVisible(false);
-        Checkbox checkbox = new Checkbox("Selbst bezahlt?");
-        checkbox.setVisible(false);
         Button addRechnung = new Button("Save");
         addRechnung.setVisible(false);
 
         comboBox.addValueChangeListener(o -> {
             String chosenPersonId = (o.getValue()).value().getId();
             PersonDTO chosenPerson = personService.findOne(chosenPersonId);
-            grid.setItems(chosenPerson.getInvoices());
+            grid.setItems(chosenPerson.getSpenden());
             datePicker.setVisible(true);
             numberField.setVisible(true);
             descriptionField.setVisible(true);
-            checkbox.setVisible(true);
             addRechnung.setVisible(true);
         });
 
         addRechnung.addClickListener(o -> {
             Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            RechnungDTO rechnungDTO = new RechnungDTO(numberField.getValue(), checkbox.getValue(), date, descriptionField.getValue());
-            PersonDTO personToChange = ((PersonRecord)comboBox.getValue()).value();
+            SpendeDTO spendeDTO = new SpendeDTO(numberField.getValue(), date, null ,descriptionField.getValue());
+            PersonDTO personToChange = comboBox.getValue().value();
 
-            personService.pushRechnung(personToChange, rechnungDTO);
+//            personService.pushSpende(personToChange, spendeDTO);
             datePicker.setValue(null);
             descriptionField.setValue("");
             numberField.setValue(0.0);
 
-            grid.setItems(personService.findOne(personToChange.getId()).getInvoices());
+            grid.setItems(personService.findOne(personToChange.getId()).getSpenden());
 
             Notification notification = Notification
                     .show("Submitted!");
@@ -102,7 +102,6 @@ public class RechnungView extends Composite<VerticalLayout> {
         horizontalLayout.add(datePicker);
         horizontalLayout.add(numberField);
         horizontalLayout.add(descriptionField);
-        horizontalLayout.add(checkbox);
         horizontalLayout.add(addRechnung);
 
         layoutColumn.add(horizontalLayout);
