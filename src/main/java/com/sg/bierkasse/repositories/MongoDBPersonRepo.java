@@ -12,6 +12,7 @@ import com.mongodb.client.model.ReplaceOneModel;
 import com.sg.bierkasse.entities.BillEntity;
 import com.sg.bierkasse.entities.PersonEntity;
 import com.sg.bierkasse.entities.RechnungEntity;
+import com.sg.bierkasse.entities.SpendeEntity;
 import jakarta.annotation.PostConstruct;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
@@ -25,6 +26,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.ReturnDocument.AFTER;
 import static com.mongodb.client.model.Updates.push;
+import static com.mongodb.client.model.Updates.set;
 
 @Repository
 public class MongoDBPersonRepo implements EntityRepo<PersonEntity> {
@@ -141,9 +143,15 @@ public class MongoDBPersonRepo implements EntityRepo<PersonEntity> {
         personCollection.updateOne(filter, change);
     }
 
-//    public void pushSpende(PersonEntity personEntity, SpendeEntity spendeEntity) {
-//        Bson filter = eq("_id", personEntity.getId());
-//        Bson change = push("spendeEntities", spendeEntity);
-//        personCollection.updateOne(filter, change);
-//    }
+    public void pushSpende(PersonEntity personEntity, SpendeEntity spendeEntity) {
+        Bson filter = eq("_id", personEntity.getId());
+        Bson change = push("spendeEntities", spendeEntity);
+        personCollection.updateOne(filter, change);
+    }
+
+    public void paySpende(SpendeEntity spendeEntity) {
+        Bson filter = eq("data.spendeEntities.date", spendeEntity.getDate());
+        Bson change = set("data.spendeEntities.payedOn", spendeEntity.getPayedOn());
+        personCollection.updateOne(filter, change);
+    }
 }

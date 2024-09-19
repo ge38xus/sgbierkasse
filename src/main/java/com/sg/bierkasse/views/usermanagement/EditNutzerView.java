@@ -29,12 +29,12 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import java.util.ArrayList;
 
 @PageTitle("Neue Nutzer")
-@Route(value = "person-form", layout = MainLayout.class)
+@Route(value = "edit-person-form", layout = MainLayout.class)
 @Uses(Icon.class)
-public class NeueNutzerView extends Composite<VerticalLayout> {
+public class EditNutzerView extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
-    public NeueNutzerView(PersonServiceImpl personService) {
+    private PersonServiceImpl personService;
+    public EditNutzerView(PersonServiceImpl personService) {
         this.personService = personService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();

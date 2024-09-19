@@ -16,7 +16,7 @@ public class PersonEntity {
 
     private List<RechnungEntity> rechnungEntities;
 
-//    private List<SpendeEntity> spendeEntities;
+    private List<SpendeEntity> spendeEntities;
 
     private boolean excelRelevant;
 
@@ -33,7 +33,7 @@ public class PersonEntity {
                         String state,
                         List<BillEntity> billEntities,
                         List<RechnungEntity> rechnungEntities,
-//                        List<SpendeEntity> spendeEntities,
+                        List<SpendeEntity> spendeEntities,
                         boolean excelRelevant,
                         boolean berichtReceiver
         ) {
@@ -44,7 +44,7 @@ public class PersonEntity {
         this.state = state;
         this.billEntities = billEntities;
         this.rechnungEntities = rechnungEntities;
-//        this.spendeEntities = spendeEntities;
+        this.spendeEntities = spendeEntities;
         this.excelRelevant = excelRelevant;
         this.berichtReceiver = berichtReceiver;
     }
@@ -119,13 +119,13 @@ public class PersonEntity {
         this.excelRelevant = excelRelevant;
     }
 
-//    public List<SpendeEntity> getSpendeEntities() {
-//        return spendeEntities;
-//    }
+    public List<SpendeEntity> getSpendeEntities() {
+        return spendeEntities;
+    }
 
-//    public void setSpendeEntities(List<SpendeEntity> spendeEntities) {
-//        this.spendeEntities = spendeEntities;
-//    }
+    public void setSpendeEntities(List<SpendeEntity> spendeEntities) {
+        this.spendeEntities = spendeEntities;
+    }
 
     public boolean isBerichtReceiver() {
         return berichtReceiver;
@@ -153,8 +153,8 @@ public class PersonEntity {
                 Objects.equals(email, that.email) &&
                 Objects.equals(state, that.state) &&
                 Objects.equals(billEntities, that.billEntities) &&
-                Objects.equals(rechnungEntities, that.rechnungEntities); //&&
-//                Objects.equals(spendeEntities, that.spendeEntities);
+                Objects.equals(rechnungEntities, that.rechnungEntities) &&
+                Objects.equals(spendeEntities, that.spendeEntities);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class PersonEntity {
                 state,
                 billEntities,
                 rechnungEntities,
-//                spendeEntities,
+                spendeEntities,
                 excelRelevant,
                 berichtReceiver);
     }

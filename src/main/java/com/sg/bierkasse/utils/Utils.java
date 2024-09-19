@@ -2,6 +2,7 @@ package com.sg.bierkasse.utils;
 
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
+import com.sg.bierkasse.dtos.SpendeDTO;
 import com.vaadin.flow.component.combobox.ComboBox;
 
 import java.text.DecimalFormat;
@@ -33,6 +34,9 @@ public class Utils {
     }
 
     public static String formatDateToDisplay(Date date) {
+        if (date == null) {
+            return " - ";
+        }
         return simpleDateFormat.format(date);
     }
 
@@ -44,10 +48,7 @@ public class Utils {
     }
 
     public static Map<String, String> getMailTemplateVariables(PersonDTO personDTO, BillDTO billDTO) {
-        Map<String, String> variables = new HashMap<>();
-        variables.put("name", personDTO.getLastName());
-        variables.put("current-date", formatDateToDisplay(new Date()));
-        variables.put("user-balance", formatDoubleToEuro(personDTO.getBalance()));
+        Map<String, String> variables = getPersonMailTemplateVariables(personDTO);
 
         if (billDTO != null) {
             variables.put("red-count", String.valueOf(billDTO.red()));
@@ -59,21 +60,54 @@ public class Utils {
         variables.put("blue-price", formatDoubleToEuro(BillDTO.BLUE_VALUE));
         variables.put("red-price", formatDoubleToEuro(BillDTO.RED_VALUE));
         variables.put("white-price", formatDoubleToEuro(BillDTO.WHITE_VALUE));
-        variables.put("green-price", formatDoubleToEuro(BillDTO.GREEN_VALUE));
 
         if (billDTO != null) {
+            variables.put("green-price", formatDoubleToEuro(billDTO.greenValue()));
+
             variables.put("blue-subtotal", formatDoubleToEuro(billDTO.blue() * BillDTO.BLUE_VALUE));
             variables.put("red-subtotal", formatDoubleToEuro(billDTO.red() * BillDTO.RED_VALUE));
             variables.put("white-subtotal", formatDoubleToEuro(billDTO.white() * BillDTO.WHITE_VALUE));
-            variables.put("green-subtotal", formatDoubleToEuro(billDTO.green() * BillDTO.GREEN_VALUE));
+            variables.put("green-subtotal", formatDoubleToEuro(billDTO.green() * billDTO.greenValue()));
             variables.put("sum", formatDoubleToEuro(Math.abs(billDTO.value())));
+            variables.put("ring-green-text", billDTO.greenText());
         }
 
         return variables;
     }
 
+    public static Map<String, String> getMailTemplateVariables(PersonDTO personDTO, SpendeDTO spendeDTO) {
+        Map<String, String> variables = getPersonMailTemplateVariables(personDTO);
+
+        if (spendeDTO != null) {
+            variables.put("spende-date", String.valueOf(spendeDTO.date()));
+            variables.put("spende-occasion", String.valueOf(spendeDTO.occasion()));
+            variables.put("spende-value", String.valueOf(spendeDTO.value()));
+        }
+
+        return variables;
+    }
+
+    private static Map<String, String> getPersonMailTemplateVariables(PersonDTO personDTO) {
+        Map<String, String> variables = new HashMap<>();
+        variables.put("name", personDTO.getLastName());
+        variables.put("current-date", formatDateToDisplay(new Date()));
+        variables.put("user-balance", formatDoubleToEuro(personDTO.getBalance()));
+        return variables;
+    }
+
     public static String replaceHtmlTemplateVariables(String someHtmlMessage, PersonDTO personDTO, BillDTO billDTO) {
         Map<String, String> variables = getMailTemplateVariables(personDTO, billDTO);
+
+        for (String key: variables.keySet()) {
+            String nextkey = "${" + key + "}";
+            someHtmlMessage = someHtmlMessage.replace(nextkey, variables.get(key));
+        }
+
+        return someHtmlMessage;
+    }
+
+    public static String replaceHtmlTemplateVariables(String someHtmlMessage, PersonDTO personDTO, SpendeDTO spendeDTO) {
+        Map<String, String> variables = getMailTemplateVariables(personDTO, spendeDTO);
 
         for (String key: variables.keySet()) {
             String nextkey = "${" + key + "}";

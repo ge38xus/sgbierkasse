@@ -6,6 +6,7 @@ import com.sg.bierkasse.dtos.RechnungDTO;
 import com.sg.bierkasse.dtos.SpendeDTO;
 import com.sg.bierkasse.repositories.MongoDBPersonRepo;
 import com.sg.bierkasse.utils.EmailTemplates;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,26 +82,32 @@ public class PersonServiceImpl implements EntityService<PersonDTO> {
         return entityRepository.update(personEntities.stream().map(PersonDTO::toPersonEntity).toList());
     }
 
-    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) {
+    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate, boolean sendNotification) {
         entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
         personDTO = this.findOne(personDTO.getId());
-        emailService.sendMail(personDTO, billDTO, emailTemplate);
+        if (sendNotification) {
+            emailService.sendMail(personDTO, billDTO, emailTemplate);
+        }
+    }
+
+    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) {
+        pushBill(personDTO, billDTO, emailTemplate, true);
     }
 
     public void pushRechnung(PersonDTO personDTO, RechnungDTO rechnungDTO) {
         entityRepository.pushRechnung(personDTO.toPersonEntity(), rechnungDTO.toRechnungEntity());
         if (rechnungDTO.privateMoneyUsed()) {
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0, rechnungDTO.value(), rechnungDTO.date());
+            BillDTO billDTO = new BillDTO(0, 0, 0, 0, 0, "", rechnungDTO.value() , rechnungDTO.date());
             entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
         }
     }
 
-//    public void pushSpende(PersonDTO personDTO, SpendeDTO spendeDTO) {
-////        entityRepository.pushSpende(personDTO.toPersonEntity(), spendeDTO.toSpendeEntity());
-//    }
+    public void pushSpende(PersonDTO personDTO, SpendeDTO spendeDTO) {
+        entityRepository.pushSpende(personDTO.toPersonEntity(), spendeDTO.toSpendeEntity());
+    }
 
     public void paySpende(SpendeDTO spende) {
-
+        entityRepository.paySpende(spende.toSpendeEntity());
     }
 
     public List<RechnungDTO> getAllRechnungDTOs(){
@@ -122,12 +129,18 @@ public class PersonServiceImpl implements EntityService<PersonDTO> {
                 .map(PersonDTO::getSpenden)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-
     }
 
     public void sendEmailToActiven() {
-        emailService.sendMail(this.findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
+//        emailService.sendMail(this.findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
+        this.findAll().stream()
+                .filter(PersonDTO::isNotAHAndHB)
+                .filter(PersonDTO::isExcelRelevant)
+                .forEach(o -> emailService.sendMail(o, EmailTemplates.BERICHT));
+    }
 
-        this.findAll().stream().filter(PersonDTO::isNotAH).filter(PersonDTO::isExcelRelevant).forEach( o -> emailService.sendMail(o, EmailTemplates.BERICHT));
+    public void useSpende(SpendeDTO spende) {
+        // ToDo:
+        throw new NotImplementedException("Not implemented yet");
     }
 }

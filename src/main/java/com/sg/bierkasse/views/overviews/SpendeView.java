@@ -48,11 +48,30 @@ public class SpendeView extends Composite<VerticalLayout> {
         grid.addColumn(SpendeDTO::occasion).setHeader("Beschreibung");
         grid.addColumn(
                 new ComponentRenderer<>(Button::new, (button, spende) -> {
-                    button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
-                            ButtonVariant.LUMO_SUCCESS,
-                            ButtonVariant.LUMO_TERTIARY);
-                    button.addClickListener(e -> personService.paySpende(spende));
+                    button.setText("");
+                    if (spende.payedOn() != null) {
+                        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+                                ButtonVariant.LUMO_ERROR,
+                                ButtonVariant.LUMO_TERTIARY);
+                        button.addClickListener(e -> personService.paySpende(spende));
+                    } else {
+                        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+                                ButtonVariant.LUMO_SUCCESS,
+                                ButtonVariant.LUMO_TERTIARY);                    }
                 })).setHeader("Payed");
+        grid.addColumn(
+                new ComponentRenderer<>(Button::new, (button, spende) -> {
+                    button.setText("");
+                    if (spende.used()) {
+                        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+                                ButtonVariant.LUMO_ERROR,
+                                ButtonVariant.LUMO_TERTIARY);
+                        button.addClickListener(e -> personService.useSpende(spende));
+                    } else {
+                        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY,
+                                ButtonVariant.LUMO_SUCCESS,
+                                ButtonVariant.LUMO_TERTIARY);                    }
+                })).setHeader("Used");
 
         grid.setItems(
                 personService.getAllSpenden()
@@ -83,10 +102,10 @@ public class SpendeView extends Composite<VerticalLayout> {
 
         addRechnung.addClickListener(o -> {
             Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            SpendeDTO spendeDTO = new SpendeDTO(numberField.getValue(), date, null ,descriptionField.getValue());
+            SpendeDTO spendeDTO = new SpendeDTO(numberField.getValue(), date, null ,descriptionField.getValue(), false, "");
             PersonDTO personToChange = comboBox.getValue().value();
 
-//            personService.pushSpende(personToChange, spendeDTO);
+            personService.pushSpende(personToChange, spendeDTO);
             datePicker.setValue(null);
             descriptionField.setValue("");
             numberField.setValue(0.0);

@@ -21,11 +21,8 @@ public class PersonDTO {
         List<BillDTO> bills;
         List<RechnungDTO> invoices;
         List<SpendeDTO> spenden;
-
         boolean excelRelevant;
         boolean berichtReceiver;
-
-
 
     public PersonDTO(PersonEntity p) {
         this.id = p.getId() == null ? new ObjectId().toHexString() : p.getId().toHexString();
@@ -35,12 +32,12 @@ public class PersonDTO {
         this.state = p.getState();
         this.bills = p.getBillEntities().stream().map(BillDTO::new).toList();
         this.invoices = p.getRechnungEntities().stream().map(RechnungDTO::new).toList();
-//        this.spenden = p.getSpendeEntities().stream().map(SpendeDTO::new).toList();
+        this.spenden = p.getSpendeEntities().stream().map(SpendeDTO::new).toList();
         this.excelRelevant = p.isExcelRelevant();
         this.berichtReceiver = p.isBerichtReceiver();
     }
 
-    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, Boolean excelRelevant) {
+    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, List<SpendeDTO> spenden, Boolean excelRelevant) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -48,6 +45,7 @@ public class PersonDTO {
         this.state = state;
         this.bills = bills;
         this.invoices = invoices;
+        this.spenden = spenden;
         this.excelRelevant = excelRelevant;
     }
 
@@ -140,7 +138,7 @@ public class PersonDTO {
         return new PersonEntity(_id, firstName, lastName, email, state,
                 bills.stream().map(BillDTO::toBillEntity).toList(),
                 invoices.stream().map(RechnungDTO::toRechnungEntity).toList(),
-//                spenden.stream().map(SpendeDTO::toSpendeEntity).toList(),
+                spenden.stream().map(SpendeDTO::toSpendeEntity).toList(),
                 excelRelevant, berichtReceiver
         );
     }
@@ -197,7 +195,7 @@ public class PersonDTO {
                 .sum();
     }
 
-    public boolean isNotAH() {
-        return Objects.equals(this.state, UserState.AH.name);
+    public boolean isNotAHAndHB() {
+        return !Objects.equals(this.state, UserState.AH.name) && !Objects.equals(this.state, UserState.HB.name);
     }
 }

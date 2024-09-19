@@ -21,6 +21,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
@@ -48,6 +49,12 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         NumberField red = new NumberField();
         NumberField white = new NumberField();
         NumberField green = new NumberField();
+        NumberField greenValue = new NumberField();
+        greenValue.setValue(GREEN_VALUE_DEFAULT);
+        greenValue.setLabel("Grün Wert");
+        TextField textField = new TextField();
+        textField.setLabel("Beschreibung Grün");
+        textField.setValue(GREEN_VALUE_DEFAULT_TEXT);
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button save = new Button();
         save.addClickListener(o -> {
@@ -55,14 +62,16 @@ public class AbrechnungView extends Composite<VerticalLayout> {
             int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
             int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
             int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
+            double greenV = greenValue.getValue().doubleValue();
 
             double value = redCnt * RED_VALUE +
                     blueCnt * BLUE_VALUE +
                     whiteCnt * WHITE_VALUE +
-                    greenCnt * GREEN_VALUE;
-            BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, -value, new Date());
+                    greenCnt * greenV;
+            BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -value, new Date());
             PersonDTO personToChange = ((PersonRecord)comboBox.getValue()).value();
             personService.pushBill(personToChange, billDTO, EmailTemplates.DRINKS_OVERVIEW);
+            comboBox.setValue(comboBox.getEmptyValue());
             blue.setValue(0.0);
             red.setValue(0.0);
             white.setValue(0.0);
@@ -116,6 +125,8 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         layoutRow.add(red);
         layoutRow.add(white);
         layoutRow.add(green);
+        layoutRow.add(greenValue);
+        layoutRow.add(textField);
         layoutColumn2.add(layoutRow2);
         layoutRow2.add(save);
         layoutRow2.add(buttonSecondary);

@@ -56,14 +56,7 @@ public class EmailService {
     }
 
     public void sendMail(PersonDTO personDTO, EmailTemplates emailTemplate) {
-        try {
-            if (!personDTO.getEmail().isEmpty()) {
-                Message message = prepareMessage(session, myAccount, personDTO, null, emailTemplate);
-                Transport.send(message); // E-Mail senden!
-            }
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
+        this.sendMail(personDTO, null, emailTemplate);
     }
 
     private static Message prepareMessage(
@@ -108,5 +101,4 @@ public class EmailService {
 
         return message;
     }
-
 }

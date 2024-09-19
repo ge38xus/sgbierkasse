@@ -6,6 +6,7 @@ import com.sg.bierkasse.views.exportviews.PDFCreator;
 import com.sg.bierkasse.views.overviews.BillOverview;
 import com.sg.bierkasse.views.billentries.EinzahlungView;
 import com.sg.bierkasse.views.overviews.RechnungView;
+import com.sg.bierkasse.views.overviews.SpendeView;
 import com.sg.bierkasse.views.usermanagement.NeueNutzerView;
 import com.sg.bierkasse.views.overviews.Overview;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -62,6 +63,7 @@ public class MainLayout extends AppLayout {
 		nav.addItem(new SideNavItem("Kassenstand", Overview.class));
 		nav.addItem(new SideNavItem("Konto", BillOverview.class));
 		nav.addItem(new SideNavItem("Rechnungen", RechnungView.class));
+		nav.addItem(new SideNavItem("Spenden", SpendeView.class));
 		nav.addItem(new SideNavItem("Bericht", PDFCreator.class));
 
 		return nav;

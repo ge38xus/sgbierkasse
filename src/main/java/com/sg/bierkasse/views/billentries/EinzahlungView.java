@@ -11,6 +11,7 @@ import com.sg.bierkasse.utils.Utils;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -43,6 +44,8 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         FormLayout formLayout2Col = new FormLayout();
         ComboBox comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
         NumberField price = new NumberField();
+        Checkbox checkbox = new Checkbox();
+        checkbox.setLabel("Benachrichtigen");
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
@@ -68,12 +71,12 @@ public class EinzahlungView extends Composite<VerticalLayout> {
 
         buttonPrimary.addClickListener(o -> {
             double value = price.getValue();
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0, value, new Date());
+            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", value, new Date());
             PersonDTO personToChange = ((PersonRecord)comboBox.getValue()).value();
             if (value > 0) {
-                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_IN_MONEY);
+                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_IN_MONEY, checkbox.getValue());
             } else if (value < 0) {
-                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_OUT_MONEY);
+                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_OUT_MONEY, checkbox.getValue());
             } else {
                 Notification notification = Notification
                         .show("Failed!");
@@ -81,6 +84,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
                 return;
             }
             price.setValue(0.0);
+            comboBox.setValue(comboBox.getEmptyValue());
             Notification notification = Notification
                     .show("Submitted!");
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -93,6 +97,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(comboBox);
         formLayout2Col.add(price);
+        formLayout2Col.add(checkbox);
         layoutColumn2.add(layoutRow);
         layoutRow.add(buttonPrimary);
         layoutRow.add(buttonSecondary);

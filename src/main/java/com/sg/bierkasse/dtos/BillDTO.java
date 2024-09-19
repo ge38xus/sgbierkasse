@@ -10,16 +10,19 @@ public record BillDTO(
         int blue,
         int white,
         int green,
+        double greenValue,
+        String greenText,
         double value,
         Date date) {
 
     public static final double BLUE_VALUE = 0.5;
     public static final double RED_VALUE = 1;
     public static final double WHITE_VALUE = 1.1;
-    public static final double GREEN_VALUE = 5;
+    public static final double GREEN_VALUE_DEFAULT = 5;
+    public static final String GREEN_VALUE_DEFAULT_TEXT = "Ring Grün";
 
     public BillDTO(BillEntity b) {
-        this(b.getRed(), b.getBlue(), b.getWhite(), b.getGreen(), b.getValue(), b.getDate());
+        this(b.getRed(), b.getBlue(), b.getWhite(), b.getGreen(), GREEN_VALUE_DEFAULT, GREEN_VALUE_DEFAULT_TEXT, b.getValue(), b.getDate());
     }
 
     public BillEntity toBillEntity() {
