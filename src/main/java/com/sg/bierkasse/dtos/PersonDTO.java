@@ -37,7 +37,7 @@ public class PersonDTO {
         this.berichtReceiver = p.isBerichtReceiver();
     }
 
-    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, List<SpendeDTO> spenden, Boolean excelRelevant) {
+    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, List<SpendeDTO> spenden, Boolean excelRelevant, Boolean berichtReceiver) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -47,6 +47,7 @@ public class PersonDTO {
         this.invoices = invoices;
         this.spenden = spenden;
         this.excelRelevant = excelRelevant;
+        this.berichtReceiver = berichtReceiver;
     }
 
     public String getId() {
@@ -61,16 +62,8 @@ public class PersonDTO {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -93,44 +86,20 @@ public class PersonDTO {
         return bills;
     }
 
-    public void addBill(BillDTO bill) {
-        this.bills.add(bill);
-    }
-
-    public void setBills(List<BillDTO> bills) {
-        this.bills = bills;
-    }
-
     public List<RechnungDTO> getInvoices() {
         return invoices;
-    }
-
-    public void setInvoices(List<RechnungDTO> invoices) {
-        this.invoices = invoices;
     }
 
     public boolean isExcelRelevant() {
         return excelRelevant;
     }
 
-    public void setExcelRelevant(boolean excelRelevant) {
-        this.excelRelevant = excelRelevant;
-    }
-
     public List<SpendeDTO> getSpenden() {
         return spenden;
     }
 
-    public void setSpenden(List<SpendeDTO> spenden) {
-        this.spenden = spenden;
-    }
-
     public boolean isBerichtReceiver() {
         return berichtReceiver;
-    }
-
-    public void setBerichtReceiver(boolean berichtReceiver) {
-        this.berichtReceiver = berichtReceiver;
     }
 
     public PersonEntity toPersonEntity() {
@@ -196,6 +165,6 @@ public class PersonDTO {
     }
 
     public boolean isNotAHAndHB() {
-        return !Objects.equals(this.state, UserState.AH.name) && !Objects.equals(this.state, UserState.HB.name);
+        return !Objects.equals(this.state, UserState.AH.name) && !Objects.equals(this.state, UserState.HB.name) && (!Objects.equals(this.state, UserState.S.name)) || this.berichtReceiver;
     }
 }

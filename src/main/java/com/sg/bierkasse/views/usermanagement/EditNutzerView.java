@@ -2,6 +2,7 @@ package com.sg.bierkasse.views.usermanagement;
 
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
@@ -26,16 +27,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
-import java.util.ArrayList;
-
 @PageTitle("Neue Nutzer")
 @Route(value = "edit-person-form", layout = MainLayout.class)
 @Uses(Icon.class)
 public class EditNutzerView extends Composite<VerticalLayout> {
 
-    private PersonServiceImpl personService;
+    private PersonDTO personDTO;
     public EditNutzerView(PersonServiceImpl personService) {
-        this.personService = personService;
+
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();
@@ -45,30 +44,50 @@ public class EditNutzerView extends Composite<VerticalLayout> {
         ComboBox<UserState> state = Utils.getComboBoxWithStatusData();
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
-        Checkbox checkbox = new Checkbox();
+        Checkbox excelRelevant = new Checkbox();
+        Checkbox berichtReceiver = new Checkbox();
+        state.addValueChangeListener(o -> {
+            if (state.getValue().equals(UserState.CB) ||
+                    state.getValue().equals(UserState.F) ||
+                    state.getValue().equals(UserState.iaCB)) {
+                berichtReceiver.setValue(true);
+                berichtReceiver.setEnabled(false);
+            } else {
+                berichtReceiver.setEnabled(true);
+                berichtReceiver.setValue(false);
+            }
+        });
+
+        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        comboBox.addValueChangeListener(o -> {
+            if (!comboBox.isEmpty()) {
+                personDTO = comboBox.getValue().value();
+                firstName.setValue(personDTO.getFirstName());
+                lastName.setValue(personDTO.getLastName());
+                emailField.setValue(personDTO.getEmail());
+                state.setValue(UserState.valueOf(personDTO.getState()));
+                excelRelevant.setValue(personDTO.isExcelRelevant());
+                berichtReceiver.setValue(personDTO.isBerichtReceiver());
+            }
+        });
 
         buttonPrimary.addClickListener(o -> {
-            PersonDTO personDTO = new PersonDTO(null,
+            personDTO = new PersonDTO(personDTO.getId(),
                     firstName.getValue(),
                     lastName.getValue(),
                     emailField.getValue(),
                     state.getValue().name,
-                    new ArrayList<>(),
-                    new ArrayList<>(),
-                    new ArrayList<>(),
-                    checkbox.getValue()
+                    personDTO.getBills(),
+                    personDTO.getInvoices(),
+                    personDTO.getSpenden(),
+                    excelRelevant.getValue(),
+                    berichtReceiver.getValue()
             );
-            personService.save(personDTO);
-            firstName.setValue("");
-            lastName.setValue("");
-            emailField.setValue("");
-            state.setValue(state.getEmptyValue());
-            Notification notification = Notification
-                    .show("Submitted!");
+            personService.update(personDTO);
+            Notification notification = Notification.show("Submitted!");
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         });
 
-        Button buttonSecondary = new Button();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -84,25 +103,25 @@ public class EditNutzerView extends Composite<VerticalLayout> {
         emailField.setLabel("Email");
         state.setLabel("Status");
         state.setWidth("min-content");
-        checkbox.setLabel("Soll in Excel Export auftauchen?");
+        excelRelevant.setLabel("Soll in Excel Export auftauchen?");
+        berichtReceiver.setLabel("Soll Bericht verschickt bekommen?");
         layoutRow.addClassName(Gap.MEDIUM);
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
         buttonPrimary.setText("Save");
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonSecondary.setText("Cancel");
-        buttonSecondary.setWidth("min-content");
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
+        layoutColumn2.add(comboBox);
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(firstName);
         formLayout2Col.add(lastName);
         formLayout2Col.add(emailField);
         formLayout2Col.add(state);
-        formLayout2Col.add(checkbox);
+        formLayout2Col.add(excelRelevant);
+        formLayout2Col.add(berichtReceiver);
         layoutColumn2.add(layoutRow);
         layoutRow.add(buttonPrimary);
-        layoutRow.add(buttonSecondary);
     }
 }

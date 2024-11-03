@@ -6,6 +6,7 @@ import com.sg.bierkasse.services.PersonServiceImpl;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.views.components.BillOverviewComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -35,17 +36,7 @@ public class BillOverview extends Composite<VerticalLayout> {
 
         this.personService = personService;
 
-        Grid<BillDTO> grid = new Grid<>(BillDTO.class, false);
-        grid.addColumn(BillDTO::formattedDate).setHeader("Datum");
-        grid.addColumn(BillDTO::formattedValue).setHeader("Summe").setKey("summe");
-        grid.addColumn(BillDTO::red).setHeader("Rot");
-        grid.addColumn(BillDTO::blue).setHeader("Blau");
-        grid.addColumn(BillDTO::white).setHeader("Weiß");
-        grid.addColumn(BillDTO::green).setHeader("Grün");
-
-        grid.getColumnByKey("summe").
-                setClassNameGenerator(summe -> summe.value() >= 0 ? "c-green" : "c-red");
-
+        Grid<BillDTO> grid = new BillOverviewComponent();
         ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
         H4 h3 = new H4();
         comboBox.addValueChangeListener(o -> {

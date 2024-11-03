@@ -8,6 +8,7 @@ import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.views.components.BillOverviewComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
@@ -35,17 +37,22 @@ import java.util.Date;
 @Uses(Icon.class)
 public class EinzahlungView extends Composite<VerticalLayout> {
 
-    private PersonServiceImpl personService;
-
     public EinzahlungView(PersonServiceImpl personService) {
-        this.personService = personService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();
-        ComboBox comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        Grid<BillDTO> grid = new BillOverviewComponent();
+        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        comboBox.addValueChangeListener(o -> {
+            if (!comboBox.isEmpty()) {
+                PersonDTO personToChange = comboBox.getValue().value();
+                grid.setItems(personToChange.getBills().stream().sorted().toList());
+            }
+        });
         NumberField price = new NumberField();
         Checkbox checkbox = new Checkbox();
         checkbox.setLabel("Benachrichtigen");
+        checkbox.setValue(true);
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
@@ -72,7 +79,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         buttonPrimary.addClickListener(o -> {
             double value = price.getValue();
             BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", value, new Date());
-            PersonDTO personToChange = ((PersonRecord)comboBox.getValue()).value();
+            PersonDTO personToChange = comboBox.getValue().value();
             if (value > 0) {
                 personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_IN_MONEY, checkbox.getValue());
             } else if (value < 0) {
@@ -99,6 +106,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         formLayout2Col.add(price);
         formLayout2Col.add(checkbox);
         layoutColumn2.add(layoutRow);
+        layoutColumn2.add(grid);
         layoutRow.add(buttonPrimary);
         layoutRow.add(buttonSecondary);
     }

@@ -56,7 +56,8 @@ public class NeueNutzerView extends Composite<VerticalLayout> {
                     new ArrayList<>(),
                     new ArrayList<>(),
                     new ArrayList<>(),
-                    checkbox.getValue()
+                    checkbox.getValue(),
+                    false
             );
             personService.save(personDTO);
             firstName.setValue("");

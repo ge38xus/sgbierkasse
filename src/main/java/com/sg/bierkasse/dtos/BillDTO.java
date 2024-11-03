@@ -13,7 +13,7 @@ public record BillDTO(
         double greenValue,
         String greenText,
         double value,
-        Date date) {
+        Date date) implements Comparable<BillDTO> {
 
     public static final double BLUE_VALUE = 0.5;
     public static final double RED_VALUE = 1;
@@ -41,7 +41,8 @@ public record BillDTO(
         return red > 0 || blue > 0 || white > 0 || green > 0;
     }
 
-    public int compareTo(Date other){
-        return this.date.compareTo(other);
+    @Override
+    public int compareTo(BillDTO o) {
+        return o.date.compareTo(date);
     }
 }
