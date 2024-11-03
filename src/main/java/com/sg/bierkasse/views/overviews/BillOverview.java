@@ -18,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Buchungen")
 @Route(value = "bill-overview", layout = MainLayout.class)
@@ -26,6 +27,7 @@ import com.vaadin.flow.router.Route;
         themeFor = "vaadin-grid",
         value = "views.css"
 )
+@RolesAllowed("ADMIN")
 public class BillOverview extends Composite<VerticalLayout> {
 
     PersonServiceImpl personService;

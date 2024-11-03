@@ -25,6 +25,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
 
@@ -33,16 +34,14 @@ import static com.sg.bierkasse.dtos.BillDTO.*;
 @PageTitle("Abrechnung")
 @Route(value = "/", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class AbrechnungView extends Composite<VerticalLayout> {
 
-    private PersonServiceImpl personService;
-
     public AbrechnungView(PersonServiceImpl personService) {
-        this.personService = personService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         VerticalLayout layoutColumn3 = new VerticalLayout();
-        ComboBox comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
 
         HorizontalLayout layoutRow = new HorizontalLayout();
         NumberField blue = new NumberField();
@@ -62,14 +61,14 @@ public class AbrechnungView extends Composite<VerticalLayout> {
             int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
             int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
             int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
-            double greenV = greenValue.getValue().doubleValue();
+            double greenV = greenValue.getValue();
 
             double value = redCnt * RED_VALUE +
                     blueCnt * BLUE_VALUE +
                     whiteCnt * WHITE_VALUE +
                     greenCnt * greenV;
             BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -value, new Date());
-            PersonDTO personToChange = ((PersonRecord)comboBox.getValue()).value();
+            PersonDTO personToChange = comboBox.getValue().value();
             personService.pushBill(personToChange, billDTO, EmailTemplates.DRINKS_OVERVIEW);
             comboBox.setValue(comboBox.getEmptyValue());
             blue.setValue(0.0);

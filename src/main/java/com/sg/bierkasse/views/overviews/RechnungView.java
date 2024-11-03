@@ -22,6 +22,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -30,6 +31,7 @@ import java.util.Locale;
 @PageTitle("Rechnungen")
 @Route(value = "invoices", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class RechnungView extends Composite<VerticalLayout> {
 
     PersonServiceImpl personService;

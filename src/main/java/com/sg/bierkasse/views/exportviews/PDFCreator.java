@@ -19,6 +19,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import org.bson.types.ObjectId;
 
 import java.io.FileNotFoundException;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @PageTitle("Bierkassenbericht")
 @Route(value = "export", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class PDFCreator extends Composite<VerticalLayout> {
 
     private final PersonServiceImpl personService;

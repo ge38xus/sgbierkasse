@@ -25,12 +25,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.ArrayList;
 
 @PageTitle("Neue Nutzer")
 @Route(value = "person-form", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class NeueNutzerView extends Composite<VerticalLayout> {
 
     PersonServiceImpl personService;

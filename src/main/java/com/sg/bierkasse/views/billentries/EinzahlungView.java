@@ -29,12 +29,14 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
 
 @PageTitle("Einzahlung")
 @Route(value = "book-money", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class EinzahlungView extends Composite<VerticalLayout> {
 
     public EinzahlungView(PersonServiceImpl personService) {

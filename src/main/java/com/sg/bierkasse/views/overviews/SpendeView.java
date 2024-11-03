@@ -23,6 +23,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.Locale;
 @PageTitle("Spenden")
 @Route(value = "spenden", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class SpendeView extends Composite<VerticalLayout> {
 
     PersonServiceImpl personService;
