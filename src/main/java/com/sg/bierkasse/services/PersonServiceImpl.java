@@ -1,14 +1,12 @@
 package com.sg.bierkasse.services;
 
-import com.sg.bierkasse.dtos.BillDTO;
-import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.dtos.RechnungDTO;
-import com.sg.bierkasse.dtos.SpendeDTO;
+import com.sg.bierkasse.dtos.*;
 import com.sg.bierkasse.repositories.MongoDBPersonRepo;
 import com.sg.bierkasse.utils.EmailTemplates;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -114,6 +112,7 @@ public class PersonServiceImpl implements EntityService<PersonDTO> {
         return this.findAll().stream()
                 .map(PersonDTO::getInvoices)
                 .flatMap(List::stream)
+                .sorted(Comparator.comparing(RechnungDTO::date))
                 .collect(Collectors.toList());
     }
 
@@ -121,6 +120,7 @@ public class PersonServiceImpl implements EntityService<PersonDTO> {
         return this.findAll().stream()
                 .map(PersonDTO::getBills)
                 .flatMap(List::stream)
+                .sorted(Comparator.comparing(BillDTO::date))
                 .collect(Collectors.toList());
     }
 

@@ -18,12 +18,10 @@ import java.util.stream.Collectors;
 public class StatisticsService {
 
     private PersonServiceImpl personService;
-    private ConventServiceImpl conventService;
     private ConventDTO lastConvent;
 
     public StatisticsService(PersonServiceImpl personService, ConventServiceImpl conventService) {
         this.personService = personService;
-        this.conventService = conventService;
         this.lastConvent = conventService.getLastConvent();
     }
 

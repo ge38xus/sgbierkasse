@@ -8,11 +8,13 @@ import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -20,22 +22,28 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
 
 import static com.sg.bierkasse.dtos.BillDTO.*;
+import static com.sg.bierkasse.utils.Utils.createHorizontalRowLayout;
 
 @PageTitle("Abrechnung")
 @Route(value = "/", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
 public class AbrechnungView extends Composite<VerticalLayout> {
+    private final IntegerField blue;
+    private final IntegerField red;
+    private final IntegerField white;
+    private final IntegerField green;
+    private final NumberField greenValue;
 
     public AbrechnungView(PersonServiceImpl personService) {
         VerticalLayout layoutColumn2 = new VerticalLayout();
@@ -43,18 +51,28 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         VerticalLayout layoutColumn3 = new VerticalLayout();
         ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
 
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        NumberField blue = new NumberField();
-        NumberField red = new NumberField();
-        NumberField white = new NumberField();
-        NumberField green = new NumberField();
-        NumberField greenValue = new NumberField();
+        HorizontalLayout layoutRowBottles = createHorizontalRowLayout();
+        HorizontalLayout layoutRowWine = createHorizontalRowLayout();
+        HorizontalLayout layoutRowSum = createHorizontalRowLayout();
+        HorizontalLayout layoutRowControls = createHorizontalRowLayout();
+
+        H4 value = new H4();
+        value.setText("Summe: 0€");
+        HasValue.ValueChangeListener valueChangeListener = valueChangeEvent -> {
+            value.setText("Summe: " + calculateValue() + "€");
+        };
+
+        blue = Utils.getIntegerField("Blaue Ringe", valueChangeListener);
+        red = Utils.getIntegerField("Rote Ringe", valueChangeListener);
+        white = Utils.getIntegerField("Weiße Ringe", valueChangeListener);
+        green = Utils.getIntegerField("Grüne Ringe", valueChangeListener);
+        greenValue = Utils.getEuroField("Grün Wert");
         greenValue.setValue(GREEN_VALUE_DEFAULT);
-        greenValue.setLabel("Grün Wert");
+
         TextField textField = new TextField();
         textField.setLabel("Beschreibung Grün");
         textField.setValue(GREEN_VALUE_DEFAULT_TEXT);
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
+
         Button save = new Button();
         save.addClickListener(o -> {
             int redCnt = red.getValue() != null ? red.getValue().intValue() : 0;
@@ -63,24 +81,19 @@ public class AbrechnungView extends Composite<VerticalLayout> {
             int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
             double greenV = greenValue.getValue();
 
-            double value = redCnt * RED_VALUE +
-                    blueCnt * BLUE_VALUE +
-                    whiteCnt * WHITE_VALUE +
-                    greenCnt * greenV;
-            BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -value, new Date());
+            BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -calculateValue(), new Date());
             PersonDTO personToChange = comboBox.getValue().value();
             personService.pushBill(personToChange, billDTO, EmailTemplates.DRINKS_OVERVIEW);
             comboBox.setValue(comboBox.getEmptyValue());
-            blue.setValue(0.0);
-            red.setValue(0.0);
-            white.setValue(0.0);
-            green.setValue(0.0);
+            blue.setValue(0);
+            red.setValue(0);
+            white.setValue(0);
+            green.setValue(0);
             Notification notification = Notification
                     .show("Submitted!");
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         });
 
-        Button buttonSecondary = new Button();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -94,40 +107,43 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         layoutColumn2.setFlexGrow(1.0, layoutColumn3);
         layoutColumn3.setWidth("100%");
         layoutColumn3.getStyle().set("flex-grow", "1");
-        layoutRow.setWidthFull();
-        layoutColumn3.setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.getStyle().set("flex-grow", "1");
-        blue.setLabel("Blau");
-        blue.setWidth("min-content");
-        red.setLabel("Rot");
-        red.setWidth("min-content");
-        white.setLabel("Weiß");
-        white.setWidth("min-content");
-        green.setLabel("Grün");
-        green.setWidth("min-content");
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.getStyle().set("flex-grow", "1");
+        layoutColumn3.setFlexGrow(1.0, layoutRowBottles);
+
         save.setText("Save");
         save.setWidth("min-content");
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonSecondary.setText("Cancel");
-        buttonSecondary.setWidth("min-content");
+
+        layoutRowBottles.add(blue);
+        layoutRowBottles.add(red);
+        layoutRowBottles.add(white);
+        layoutRowWine.add(green);
+        layoutRowWine.add(greenValue);
+        layoutRowWine.add(textField);
+        layoutRowSum.add(value);
+        layoutRowControls.add(save);
+
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(layoutColumn3);
         layoutColumn3.add(comboBox);
-        layoutColumn3.add(layoutRow);
-        layoutRow.add(blue);
-        layoutRow.add(red);
-        layoutRow.add(white);
-        layoutRow.add(green);
-        layoutRow.add(greenValue);
-        layoutRow.add(textField);
-        layoutColumn2.add(layoutRow2);
-        layoutRow2.add(save);
-        layoutRow2.add(buttonSecondary);
+        layoutColumn3.add(layoutRowBottles);
+        layoutColumn3.add(layoutRowWine);
+        layoutColumn3.add(layoutRowSum);
+        layoutColumn3.add(layoutRowControls);
+
+
+    }
+
+    public double calculateValue() {
+        int redCnt = red.getValue() != null ? red.getValue().intValue() : 0;
+        int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
+        int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
+        int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
+        double greenV = greenValue.getValue();
+
+        return redCnt * RED_VALUE +
+                blueCnt * BLUE_VALUE +
+                whiteCnt * WHITE_VALUE +
+                greenCnt * greenV;
     }
 }
