@@ -5,6 +5,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.sg.bierkasse.dtos.BierstandDTO;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
@@ -27,14 +28,18 @@ public class PDFService {
     private final PersonServiceImpl personService;
     private final StatisticsService statisticsService;
 
+    private final BierstandServiceImpl bierstandService;
+
+    private static final Integer NUMBER_OF_BIERSTANDS_TO_BE_INCLUDED = 5;
     private static final List<String> PERSON_HEADERS = List.of("Status", "Name", "Kontostand", "Das letzte Mal eingezahlt am", "Das letzte mal im Plus am");
     private static final List<String> STATISTICS_HEADERS = List.of("Eingezahlt", "Bestellt", "Konsumiert");
     private static final List<String> DAY_STATISTICS_HEADERS = List.of("Guthaben Aktive", "Guthaben AH", "Schulden Aktive", "Schulden AH");
     private static final List<String> RANKING_HEADERS = List.of("Blau Sieger", "Rot Sieger", "Weiß Sieger");
 
-    public PDFService(PersonServiceImpl personService, StatisticsService statisticsService) {
+    public PDFService(PersonServiceImpl personService, StatisticsService statisticsService, BierstandServiceImpl bierstandService) {
         this.personService = personService;
         this.statisticsService = statisticsService;
+        this.bierstandService = bierstandService;
     }
 
     public void createPDFOverview() throws DocumentException, FileNotFoundException {
@@ -45,9 +50,10 @@ public class PDFService {
         Font h1 = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK);
         Font h2 = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, BaseColor.BLACK);
 
-        Chunk chunk = new Chunk("Bierkassenbericht zum " + Utils.formatDateToDisplay(new Date()), h1);
-        document.add(chunk);
+        document.add(new Chunk("Bierkassenbericht zum " + Utils.formatDateToDisplay(new Date()), h1));
         document.add(this.generateEmptyRow(30));
+        document.add(this.generateBierkasseOverview());
+        document.add(this.generateEmptyRow(20));
         document.add(new Chunk("Bierkasse Summen " + statisticsService.getLastConvent().formattedDate() + " - " + Utils.formatDateToDisplay(new Date()) , h2));
         document.add(this.generateEmptyRow(5));
         document.add(this.generateStatistics());
@@ -116,8 +122,6 @@ public class PDFService {
         return pdfPTable;
     }
 
-
-
     private PdfPTable generateStatistics() {
         PdfPTable table = getPdfTableWithHeader(STATISTICS_HEADERS);
         addStatisticsTableData(table);
@@ -139,7 +143,6 @@ public class PDFService {
         return table;
     }
 
-
     private void addStatisticsTableData(PdfPTable table) {
         double moneyInSum = statisticsService.getMoneyInSum();
         table.addCell(generateCell(Utils.formatDoubleToEuro(moneyInSum), 0));
@@ -147,7 +150,6 @@ public class PDFService {
         table.addCell(generateCell(Utils.formatDoubleToEuro(invoicesSum), 0));
         double consumptionSum = statisticsService.getConsumptionSum();
         table.addCell(generateCell(Utils.formatDoubleToEuro(consumptionSum), 0));
-
 
         table.completeRow();
     }
@@ -158,7 +160,6 @@ public class PDFService {
         addRows(table);
         return table;
     }
-
 
     private void addRows(PdfPTable table) {
         List<PersonDTO> people = personService.findAll().stream()
@@ -174,5 +175,34 @@ public class PDFService {
             table.addCell(generateCell(personDTO.lastPositiveOn(), counter));
             counter++;
         }
+    }
+
+    private PdfPTable generateBierkasseOverview() {
+        List<BierstandDTO> lastBierkassenStands = bierstandService.findAll().stream().limit(NUMBER_OF_BIERSTANDS_TO_BE_INCLUDED).toList();
+
+        List<String> dates = new java.util.ArrayList<>(List.of("Datum"));
+        dates.addAll(
+                lastBierkassenStands.stream()
+                        .map(BierstandDTO::formattedDate)
+                        .toList());
+
+        PdfPTable table = getPdfTableWithHeader(dates);
+
+        List<String> kassenstand = lastBierkassenStands.stream().map(BierstandDTO::formattedKassenStand).toList();
+        addHorizontalContentRowWithHeader(table, "Kassenstand", kassenstand, 1);
+
+        List<String> kellerwert = lastBierkassenStands.stream().map(BierstandDTO::formattedSum).toList();
+        addHorizontalContentRowWithHeader(table, "Kellerwert", kellerwert, 0);
+
+        //ToDo more to be added
+
+        return table;
+    }
+    private void addHorizontalContentRowWithHeader(PdfPTable table, String header, List<String> content, int color) {
+        addHeaderCellToTableWithStringContent(table, header);
+        for (String el: content) {
+            table.addCell(generateCell(el, color));
+        }
+        table.completeRow();
     }
 }
