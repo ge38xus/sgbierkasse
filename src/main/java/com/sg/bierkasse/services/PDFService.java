@@ -194,6 +194,15 @@ public class PDFService {
         List<String> kellerwert = lastBierkassenStands.stream().map(BierstandDTO::formattedSum).toList();
         addHorizontalContentRowWithHeader(table, "Kellerwert", kellerwert, 0);
 
+        List<String> spendenwert = lastBierkassenStands.stream().map(BierstandDTO::formattedSpenden).toList();
+        addHorizontalContentRowWithHeader(table, "Spendenstand", spendenwert, 1);
+
+        List<String> guthabenwert = lastBierkassenStands.stream().map(BierstandDTO::formattedGuthaben).toList();
+        addHorizontalContentRowWithHeader(table, "Guthabenstand", guthabenwert, 0);
+
+        List<String> schuldenwert = lastBierkassenStands.stream().map(BierstandDTO::formattedSchulden).toList();
+        addHorizontalContentRowWithHeader(table, "Schuldenstand", schuldenwert, 0);
+
         //ToDo more to be added
 
         return table;

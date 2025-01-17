@@ -15,11 +15,14 @@ public record BierstandDTO(
      double wein,
      double sonstiges,
      double sum,
+     double sumSpenden,
+     double sumGuthaben,
+     double sumSchulden,
      double kassenStand
 ) {
 
     public BierstandDTO(BierstandEntity bierstandEntity) {
-        this(bierstandEntity.getId(), bierstandEntity.getDate(), bierstandEntity.getRoteKisten(), bierstandEntity.getBlaueKisten(), bierstandEntity.getWeisseKisten(), bierstandEntity.getWein(), bierstandEntity.getSonstiges(), bierstandEntity.getSum(), bierstandEntity.getKassenStand());
+        this(bierstandEntity.getId(), bierstandEntity.getDate(), bierstandEntity.getRoteKisten(), bierstandEntity.getBlaueKisten(), bierstandEntity.getWeisseKisten(), bierstandEntity.getWein(), bierstandEntity.getSonstiges(), bierstandEntity.getSum(), bierstandEntity.getSumSpenden(), bierstandEntity.getSumGuthaben(), bierstandEntity.getSumSchulden(), bierstandEntity.getKassenStand());
     }
 
     public String formattedDate() {
@@ -38,11 +41,24 @@ public record BierstandDTO(
         return Utils.formatDoubleToEuro(wein);
     }
 
+    public String formattedSpenden() {
+        return Utils.formatDoubleToEuro(sumSpenden);
+    }
+
+    public String formattedGuthaben() {
+        return Utils.formatDoubleToEuro(sumGuthaben);
+    }
+
+    public String formattedSchulden() {
+        return Utils.formatDoubleToEuro(sumSchulden);
+    }
+
     public String formattedRest() {
         return Utils.formatDoubleToEuro(sonstiges);
     }
 
+
     public BierstandEntity toBierstandEntity() {
-        return new BierstandEntity(id, date, roteKisten, blaueKisten, weisseKisten, wein, sonstiges, sum, kassenStand);
+        return new BierstandEntity(id, date, roteKisten, blaueKisten, weisseKisten, wein, sonstiges, sum, sumSpenden, sumGuthaben, sumSchulden, kassenStand);
     }
 }

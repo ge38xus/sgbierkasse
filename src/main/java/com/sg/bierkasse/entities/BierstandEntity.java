@@ -14,15 +14,16 @@ public class BierstandEntity {
     private int weisseKisten;
     private double wein;
     private double sonstiges;
-
     private double sum;
-
+    private double sumSpenden;
+    private double sumGuthaben;
+    private double sumSchulden;
     private double kassenStand;
 
     public BierstandEntity() {
     }
 
-    public BierstandEntity(ObjectId id, Date date, int roteKisten, int blaueKisten, int weisseKisten, double wein, double sonstiges, double sum, double kassenStand) {
+    public BierstandEntity(ObjectId id, Date date, int roteKisten, int blaueKisten, int weisseKisten, double wein, double sonstiges, double sum, double sumSpenden, double sumGuthaben, double sumSchulden, double kassenStand) {
         this.id = id;
         this.date = date;
         this.roteKisten = roteKisten;
@@ -31,6 +32,9 @@ public class BierstandEntity {
         this.wein = wein;
         this.sonstiges = sonstiges;
         this.sum = sum;
+        this.sumSpenden = sumSpenden;
+        this.sumGuthaben = sumGuthaben;
+        this.sumSchulden = sumSchulden;
         this.kassenStand = kassenStand;
     }
 
@@ -106,16 +110,40 @@ public class BierstandEntity {
         return sum;
     }
 
+    public double getSumSpenden() {
+        return sumSpenden;
+    }
+
+    public void setSumSpenden(double sumSpenden) {
+        this.sumSpenden = sumSpenden;
+    }
+
+    public double getSumGuthaben() {
+        return sumGuthaben;
+    }
+
+    public void setSumGuthaben(double sumGuthaben) {
+        this.sumGuthaben = sumGuthaben;
+    }
+
+    public double getSumSchulden() {
+        return sumSchulden;
+    }
+
+    public void setSumSchulden(double sumSchulden) {
+        this.sumSchulden = sumSchulden;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BierstandEntity that = (BierstandEntity) o;
-        return roteKisten == that.roteKisten && blaueKisten == that.blaueKisten && weisseKisten == that.weisseKisten && Double.compare(that.wein, wein) == 0 && Double.compare(that.sonstiges, sonstiges) == 0 && Objects.equals(id, that.id) && Objects.equals(date, that.date);
+        return roteKisten == that.roteKisten && blaueKisten == that.blaueKisten && weisseKisten == that.weisseKisten && Double.compare(that.wein, wein) == 0 && Double.compare(that.sonstiges, sonstiges) == 0 && Double.compare(that.sumSpenden, sumSpenden) == 0 && Double.compare(that.sumGuthaben, sumGuthaben) == 0 && Double.compare(that.sumSchulden, sumSchulden) == 0 && Double.compare(that.sum, sum) == 0 && Double.compare(that.kassenStand, kassenStand) == 0 && Objects.equals(id, that.id) && Objects.equals(date, that.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, roteKisten, blaueKisten, weisseKisten, wein, sonstiges);
+        return Objects.hash(id, date, roteKisten, blaueKisten, weisseKisten, wein, sonstiges, sumSpenden, sumGuthaben, sumSchulden, sum, kassenStand);
     }
 }

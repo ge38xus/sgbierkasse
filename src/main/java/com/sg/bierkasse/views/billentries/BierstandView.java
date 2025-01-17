@@ -2,8 +2,8 @@ package com.sg.bierkasse.views.billentries;
 
 
 import com.sg.bierkasse.dtos.BierstandDTO;
-import com.sg.bierkasse.dtos.RechnungDTO;
 import com.sg.bierkasse.services.BierstandServiceImpl;
+import com.sg.bierkasse.services.StatisticsService;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
@@ -23,11 +23,9 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.time.ZoneId;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -39,7 +37,7 @@ import static com.sg.bierkasse.dtos.BillDTO.*;
 @RolesAllowed("ADMIN")
 public class BierstandView extends Composite<VerticalLayout> {
 
-    public BierstandView(BierstandServiceImpl bierstandService) {
+    public BierstandView(BierstandServiceImpl bierstandService, StatisticsService statisticsService) {
         VerticalLayout layoutColumn = new VerticalLayout();
 
         H3 h3 = new H3();
@@ -72,10 +70,10 @@ public class BierstandView extends Composite<VerticalLayout> {
         grid.setItems(bierstandService.findAll());
         save.addClickListener(o -> {
             Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            int redCnt = red.getValue() != null ? red.getValue().intValue() : 0;
-            int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
-            int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
-            double weinWert = wein.getValue() != null ? wein.getValue().doubleValue() : 0.0;
+            int redCnt = red.getValue() != null ? red.getValue() : 0;
+            int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
+            int whiteCnt = white.getValue() != null ? white.getValue() : 0;
+            double weinWert = wein.getValue() != null ? wein.getValue() : 0.0;
             double sonstigesWert = sonstiges.getValue() != null ? sonstiges.getValue() : 0.0;
             double kassenStand = kassenstand.getValue() != null ? kassenstand.getValue() : 0.0;
 
@@ -84,7 +82,9 @@ public class BierstandView extends Composite<VerticalLayout> {
                     whiteCnt * WHITE_VALUE * 20 +
                     weinWert + sonstigesWert;
 
-            BierstandDTO bierstandDTO = new BierstandDTO(null, date, redCnt, blueCnt, whiteCnt, weinWert, sonstigesWert, sum, kassenStand);
+            BierstandDTO bierstandDTO = new BierstandDTO(null, date, redCnt, blueCnt, whiteCnt, weinWert, sonstigesWert, sum,
+                    statisticsService.getSpendenStandForDate(date), statisticsService.calculateAllPlusAccountsForDate(date),
+                    statisticsService.calculateAllMinusAccountsForDate(date), kassenStand);
             bierstandService.save(bierstandDTO);
             blue.setValue(0);
             red.setValue(0);

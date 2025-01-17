@@ -119,6 +119,13 @@ public class PersonDTO {
         return 0.0;
     }
 
+    public double getBalanceUpToDate(Date date) {
+        if (bills != null && !bills.isEmpty()) {
+            return bills.stream().filter(b -> b.date().compareTo(date) <= 0).mapToDouble(BillDTO::value).sum();
+        }
+        return 0.0;
+    }
+
     public String getFormattedBalance() {
         return Utils.formatDoubleToEuro(getBalance());
     }
