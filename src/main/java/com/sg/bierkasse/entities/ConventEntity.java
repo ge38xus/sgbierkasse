@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.Objects;
 
-public class ConventEntity {
+public class ConventEntity implements BaseEntity {
 
     private ObjectId id;
     private Date date;
