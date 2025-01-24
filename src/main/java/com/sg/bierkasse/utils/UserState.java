@@ -8,7 +8,9 @@ public enum UserState {
     CK("CK", "CK"),
     iaCB("iaCB", "iaCB"),
     AH("AH", "Alte Herr"),
-    HB("HB", "Hausbewohner");
+    HB("HB", "Hausbewohner"),
+    X("X", "Ex User (inaktiv)");
+
 
     public final String name;
     public final String fullName;

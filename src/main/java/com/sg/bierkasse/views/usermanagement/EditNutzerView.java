@@ -52,9 +52,17 @@ public class EditNutzerView extends Composite<VerticalLayout> {
             if (state.getValue().equals(UserState.CB) ||
                     state.getValue().equals(UserState.F) ||
                     state.getValue().equals(UserState.iaCB)) {
+                excelRelevant.setEnabled(false);
+                excelRelevant.setValue(true);
                 berichtReceiver.setValue(true);
                 berichtReceiver.setEnabled(false);
+            } else if (state.getValue().equals(UserState.X)){
+                excelRelevant.setEnabled(false);
+                excelRelevant.setValue(false);
+                berichtReceiver.setEnabled(false);
+                berichtReceiver.setValue(false);
             } else {
+                excelRelevant.setEnabled(true);
                 berichtReceiver.setEnabled(true);
                 berichtReceiver.setValue(false);
             }
