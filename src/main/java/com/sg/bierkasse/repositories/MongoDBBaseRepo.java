@@ -30,7 +30,7 @@ public abstract class MongoDBBaseRepo<T extends BaseEntity> implements EntityRep
     private static final String DATABASE_NAME = "test";
 
     private final MongoClient client;
-    private MongoCollection<T> mongoCollection;
+    MongoCollection<T> mongoCollection;
 
     public MongoDBBaseRepo(MongoClient mongoClient) {
         this.client = mongoClient;

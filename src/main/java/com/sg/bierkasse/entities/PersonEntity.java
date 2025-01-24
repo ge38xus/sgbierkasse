@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import java.util.List;
 import java.util.Objects;
 
-public class PersonEntity {
+public class PersonEntity implements BaseEntity{
 
     private ObjectId id;
     private String firstName;
@@ -53,9 +53,8 @@ public class PersonEntity {
         return id;
     }
 
-    public PersonEntity setId(ObjectId id) {
+    public void setId(ObjectId id) {
         this.id = id;
-        return this;
     }
 
     public String getFirstName() {
