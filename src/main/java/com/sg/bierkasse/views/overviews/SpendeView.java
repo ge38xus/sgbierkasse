@@ -2,7 +2,7 @@ package com.sg.bierkasse.views.overviews;
 
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.SpendeDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
@@ -35,9 +35,9 @@ import java.util.Locale;
 @RolesAllowed("ADMIN")
 public class SpendeView extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
+    PersonService personService;
 
-    public SpendeView(PersonServiceImpl personService) {
+    public SpendeView(PersonService personService) {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 

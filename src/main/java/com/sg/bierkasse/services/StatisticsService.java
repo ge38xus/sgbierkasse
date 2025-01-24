@@ -20,10 +20,10 @@ public class StatisticsService {
 
     public static final String SPENDEN_USER_ID = "662d79bc151104579194f5b0";
 
-    private final PersonServiceImpl personService;
+    private final PersonService personService;
     private final ConventDTO lastConvent;
 
-    public StatisticsService(PersonServiceImpl personService, ConventServiceImpl conventService) {
+    public StatisticsService(PersonService personService, ConventService conventService) {
         this.personService = personService;
         this.lastConvent = conventService.getLastConvent();
     }

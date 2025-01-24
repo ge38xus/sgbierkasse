@@ -1,7 +1,7 @@
 package com.sg.bierkasse.views.usermanagement;
 
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
 import com.sg.bierkasse.utils.Utils;
@@ -35,7 +35,7 @@ import jakarta.annotation.security.RolesAllowed;
 public class EditNutzerView extends Composite<VerticalLayout> {
 
     private PersonDTO personDTO;
-    public EditNutzerView(PersonServiceImpl personService) {
+    public EditNutzerView(PersonService personService) {
 
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();

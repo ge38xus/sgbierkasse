@@ -2,7 +2,7 @@ package com.sg.bierkasse.views.overviews;
 
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.RechnungDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
@@ -34,9 +34,9 @@ import java.util.Locale;
 @RolesAllowed("ADMIN")
 public class RechnungView extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
+    PersonService personService;
 
-    public RechnungView(PersonServiceImpl personService) {
+    public RechnungView(PersonService personService) {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 

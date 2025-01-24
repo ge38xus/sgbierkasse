@@ -2,7 +2,7 @@ package com.sg.bierkasse.views.billentries;
 
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
@@ -45,7 +45,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
     private final IntegerField green;
     private final NumberField greenValue;
 
-    public AbrechnungView(PersonServiceImpl personService) {
+    public AbrechnungView(PersonService personService) {
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         VerticalLayout layoutColumn3 = new VerticalLayout();
@@ -58,9 +58,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
 
         H4 value = new H4();
         value.setText("Summe: 0€");
-        HasValue.ValueChangeListener valueChangeListener = valueChangeEvent -> {
-            value.setText("Summe: " + calculateValue() + "€");
-        };
+        HasValue.ValueChangeListener valueChangeListener = valueChangeEvent -> value.setText("Summe: " + calculateValue() + "€");
 
         blue = Utils.getIntegerField("Blaue Ringe", valueChangeListener);
         red = Utils.getIntegerField("Rote Ringe", valueChangeListener);
@@ -75,10 +73,10 @@ public class AbrechnungView extends Composite<VerticalLayout> {
 
         Button save = new Button();
         save.addClickListener(o -> {
-            int redCnt = red.getValue() != null ? red.getValue().intValue() : 0;
-            int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
-            int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
-            int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
+            int redCnt = red.getValue() != null ? red.getValue() : 0;
+            int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
+            int whiteCnt = white.getValue() != null ? white.getValue() : 0;
+            int greenCnt = green.getValue() != null ? green.getValue() : 0;
             double greenV = greenValue.getValue();
 
             BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -calculateValue(), new Date());
@@ -135,10 +133,10 @@ public class AbrechnungView extends Composite<VerticalLayout> {
     }
 
     public double calculateValue() {
-        int redCnt = red.getValue() != null ? red.getValue().intValue() : 0;
-        int blueCnt = blue.getValue() != null ? blue.getValue().intValue() : 0;
-        int whiteCnt = white.getValue() != null ? white.getValue().intValue() : 0;
-        int greenCnt = green.getValue() != null ? green.getValue().intValue() : 0;
+        int redCnt = red.getValue() != null ? red.getValue() : 0;
+        int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
+        int whiteCnt = white.getValue() != null ? white.getValue() : 0;
+        int greenCnt = green.getValue() != null ? green.getValue() : 0;
         double greenV = greenValue.getValue();
 
         return redCnt * RED_VALUE +

@@ -8,20 +8,15 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class BierstandServiceImpl implements EntityService<BierstandDTO> {
+public class BierstandService implements EntityService<BierstandDTO> {
 
     private final MongoDBBierstandRepo entityRepository;
-    private final StatisticsService statisticsService;
 
-    public BierstandServiceImpl(MongoDBBierstandRepo entityRepository, StatisticsService statisticsService) {
+    public BierstandService(MongoDBBierstandRepo entityRepository) {
         this.entityRepository = entityRepository;
-        this.statisticsService = statisticsService;
     }
 
     public BierstandDTO addStatsAndSave(BierstandDTO bierstandDTO) {
-
-
-
         return save(bierstandDTO);
     }
 

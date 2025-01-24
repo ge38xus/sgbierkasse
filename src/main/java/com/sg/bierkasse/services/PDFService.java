@@ -25,10 +25,10 @@ public class PDFService {
     private static final String BIERKASSEIBAN = "DE92 5002 4024 7529 7915 31";
     private static final String PAYPALKONTO = "bierkasse.sg@gmail.com";
 
-    private final PersonServiceImpl personService;
+    private final PersonService personService;
     private final StatisticsService statisticsService;
 
-    private final BierstandServiceImpl bierstandService;
+    private final BierstandService bierstandService;
 
     private static final Integer NUMBER_OF_BIERSTANDS_TO_BE_INCLUDED = 5;
     private static final List<String> PERSON_HEADERS = List.of("Status", "Name", "Kontostand", "Das letzte Mal eingezahlt am", "Das letzte mal im Plus am");
@@ -36,7 +36,7 @@ public class PDFService {
     private static final List<String> DAY_STATISTICS_HEADERS = List.of("Guthaben Aktive", "Guthaben AH", "Schulden Aktive", "Schulden AH");
     private static final List<String> RANKING_HEADERS = List.of("Blau Sieger", "Rot Sieger", "Weiß Sieger");
 
-    public PDFService(PersonServiceImpl personService, StatisticsService statisticsService, BierstandServiceImpl bierstandService) {
+    public PDFService(PersonService personService, StatisticsService statisticsService, BierstandService bierstandService) {
         this.personService = personService;
         this.statisticsService = statisticsService;
         this.bierstandService = bierstandService;

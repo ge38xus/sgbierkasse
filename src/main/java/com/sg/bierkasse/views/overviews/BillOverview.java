@@ -2,7 +2,7 @@ package com.sg.bierkasse.views.overviews;
 
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.Utils;
@@ -30,13 +30,9 @@ import jakarta.annotation.security.RolesAllowed;
 @RolesAllowed("ADMIN")
 public class BillOverview extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
-
-    public BillOverview(PersonServiceImpl personService) {
+    public BillOverview(PersonService personService) {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-
-        this.personService = personService;
 
         Grid<BillDTO> grid = new BillOverviewComponent();
         ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());

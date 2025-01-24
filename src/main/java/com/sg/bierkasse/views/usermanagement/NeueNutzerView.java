@@ -1,7 +1,7 @@
 package com.sg.bierkasse.views.usermanagement;
 
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.UserState;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
@@ -35,9 +35,7 @@ import java.util.ArrayList;
 @RolesAllowed("ADMIN")
 public class NeueNutzerView extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
-    public NeueNutzerView(PersonServiceImpl personService) {
-        this.personService = personService;
+    public NeueNutzerView(PersonService personService) {
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();

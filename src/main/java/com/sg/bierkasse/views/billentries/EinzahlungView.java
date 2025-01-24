@@ -3,7 +3,7 @@ package com.sg.bierkasse.views.billentries;
 
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
@@ -39,7 +39,7 @@ import java.util.Date;
 @RolesAllowed("ADMIN")
 public class EinzahlungView extends Composite<VerticalLayout> {
 
-    public EinzahlungView(PersonServiceImpl personService) {
+    public EinzahlungView(PersonService personService) {
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();

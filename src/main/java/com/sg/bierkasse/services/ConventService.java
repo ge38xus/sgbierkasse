@@ -9,11 +9,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ConventServiceImpl implements EntityService<ConventDTO> {
+public class ConventService implements EntityService<ConventDTO> {
 
     private final MongoDBConventRepo entityRepository;
 
-    public ConventServiceImpl(MongoDBConventRepo entityRepository) {
+    public ConventService(MongoDBConventRepo entityRepository) {
         this.entityRepository = entityRepository;
     }
 

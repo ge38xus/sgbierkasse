@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class PersonServiceImpl implements EntityService<PersonDTO> {
+public class PersonService implements EntityService<PersonDTO> {
 
     private final MongoDBPersonRepo entityRepository;
     private final EmailService emailService;
 
-    public PersonServiceImpl(MongoDBPersonRepo entityRepository, EmailService emailService) {
+    public PersonService(MongoDBPersonRepo entityRepository, EmailService emailService) {
         this.entityRepository = entityRepository;
         this.emailService = emailService;
     }

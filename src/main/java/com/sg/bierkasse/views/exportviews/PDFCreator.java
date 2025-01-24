@@ -3,9 +3,9 @@ package com.sg.bierkasse.views.exportviews;
 import com.itextpdf.text.DocumentException;
 import com.sg.bierkasse.dtos.ConventDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.ConventServiceImpl;
+import com.sg.bierkasse.services.ConventService;
 import com.sg.bierkasse.services.PDFService;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -34,15 +34,15 @@ import java.util.stream.Collectors;
 @RolesAllowed("ADMIN")
 public class PDFCreator extends Composite<VerticalLayout> {
 
-    private final PersonServiceImpl personService;
+    private final PersonService personService;
 
-    private final ConventServiceImpl conventService;
+    private final ConventService conventService;
     private final PDFService pdfService;
 
     private Checkbox sendCheckbox;
     private Checkbox testBerichtCheckbox;
 
-    public PDFCreator(PersonServiceImpl personService, ConventServiceImpl conventService, PDFService pdfService) {
+    public PDFCreator(PersonService personService, ConventService conventService, PDFService pdfService) {
         this.personService = personService;
         this.pdfService = pdfService;
         this.conventService = conventService;

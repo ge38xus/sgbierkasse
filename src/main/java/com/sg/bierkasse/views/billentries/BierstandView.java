@@ -2,7 +2,7 @@ package com.sg.bierkasse.views.billentries;
 
 
 import com.sg.bierkasse.dtos.BierstandDTO;
-import com.sg.bierkasse.services.BierstandServiceImpl;
+import com.sg.bierkasse.services.BierstandService;
 import com.sg.bierkasse.services.StatisticsService;
 import com.sg.bierkasse.utils.Utils;
 import com.sg.bierkasse.views.MainLayout;
@@ -37,7 +37,7 @@ import static com.sg.bierkasse.dtos.BillDTO.*;
 @RolesAllowed("ADMIN")
 public class BierstandView extends Composite<VerticalLayout> {
 
-    public BierstandView(BierstandServiceImpl bierstandService, StatisticsService statisticsService) {
+    public BierstandView(BierstandService bierstandService, StatisticsService statisticsService) {
         VerticalLayout layoutColumn = new VerticalLayout();
 
         H3 h3 = new H3();

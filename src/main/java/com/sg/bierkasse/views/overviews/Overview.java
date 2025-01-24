@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.services.PersonServiceImpl;
+import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -26,9 +26,9 @@ import jakarta.annotation.security.RolesAllowed;
 @RolesAllowed("ADMIN")
 public class Overview extends Composite<VerticalLayout> {
 
-    PersonServiceImpl personService;
+    PersonService personService;
 
-    public Overview(PersonServiceImpl personService) {
+    public Overview(PersonService personService) {
         this.personService = personService;
 
         Grid<PersonDTO> grid = new Grid<>(PersonDTO.class, false);
