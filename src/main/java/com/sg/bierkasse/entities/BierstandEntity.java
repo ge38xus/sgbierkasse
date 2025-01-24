@@ -5,8 +5,7 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.Objects;
 
-public class BierstandEntity {
-
+public class BierstandEntity implements BaseEntity{
     private ObjectId id;
     private Date date;
     private int roteKisten;
