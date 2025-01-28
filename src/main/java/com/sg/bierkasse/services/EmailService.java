@@ -77,28 +77,23 @@ public class EmailService {
         messageBodyPart.setContent(someHtmlMessage, "text/html; charset=utf-8");
         multipart.addBodyPart(messageBodyPart);
 
-        messageBodyPart = new MimeBodyPart();
-        DataSource fds = new FileDataSource("src/main/resources/images/image-2.png");
-        messageBodyPart.setDataHandler(new DataHandler(fds));
-        messageBodyPart.setHeader("Content-ID", "sg-wappen");
-        multipart.addBodyPart(messageBodyPart);
-
-        messageBodyPart = new MimeBodyPart();
-        fds = new FileDataSource("src/main/resources/images/image-1.png");
-        messageBodyPart.setDataHandler(new DataHandler(fds));
-        messageBodyPart.setHeader("Content-ID", "paypal");
-        multipart.addBodyPart(messageBodyPart);
+        attachPicture(multipart, "sg-wappen", "src/main/resources/images/image-2.png");
+        attachPicture(multipart, "paypal", "src/main/resources/images/image-1.png");
 
         if (emailTemplate == EmailTemplates.BERICHT) {
-            messageBodyPart = new MimeBodyPart();
-            fds = new FileDataSource("./Bierkassenbericht.pdf");
-            messageBodyPart.setDataHandler(new DataHandler(fds));
-            messageBodyPart.setFileName("Bierkassenbericht.pdf");
-            multipart.addBodyPart(messageBodyPart);
+            attachPicture(multipart, "bierkassenbericht", "./Bierkassenbericht.pdf");
         }
 
         message.setContent(multipart);
-
         return message;
+    }
+
+    private static void attachPicture(MimeMultipart multipart, String fileID, String pathToFile) throws MessagingException {
+        BodyPart messageBodyPart = new MimeBodyPart();
+        DataSource fds = new FileDataSource(pathToFile);
+        messageBodyPart.setDataHandler(new DataHandler(fds));
+        messageBodyPart.setHeader("Content-ID", fileID);
+        messageBodyPart.setFileName(pathToFile.substring(pathToFile.lastIndexOf('/') + 1));
+        multipart.addBodyPart(messageBodyPart);
     }
 }

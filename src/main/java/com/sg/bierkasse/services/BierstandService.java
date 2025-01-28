@@ -16,10 +16,6 @@ public class BierstandService implements EntityService<BierstandDTO> {
         this.entityRepository = entityRepository;
     }
 
-    public BierstandDTO addStatsAndSave(BierstandDTO bierstandDTO) {
-        return save(bierstandDTO);
-    }
-
     @Override
     public BierstandDTO save(BierstandDTO bierstandDTO) {
         return new BierstandDTO(entityRepository.save(bierstandDTO.toBierstandEntity()));

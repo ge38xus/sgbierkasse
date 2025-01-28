@@ -75,10 +75,17 @@ public class PDFCreator extends Composite<VerticalLayout> {
     }
 
     private HorizontalLayout generateFooter() {
-        sendCheckbox = new Checkbox("Versende an alle CB, iaCB, F");
+        sendCheckbox = new Checkbox("Versende Bericht Relevante User");
         sendCheckbox.setValue(false);
+        sendCheckbox.setEnabled(false);
         testBerichtCheckbox = new Checkbox("*Testbericht");
         testBerichtCheckbox.setValue(true);
+        testBerichtCheckbox.addValueChangeListener(o -> {
+           if (sendCheckbox.getValue()) {
+               sendCheckbox.setValue(false);
+           }
+           sendCheckbox.setEnabled(!sendCheckbox.isEnabled());
+        });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.add(generateExportButton());
@@ -100,10 +107,15 @@ public class PDFCreator extends Composite<VerticalLayout> {
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 }
                 if (sendCheckbox.getValue()) {
-                    personService.sendEmailToActiven();
+                    personService.sendBerichtToRelevant();
                     Notification notification = Notification
                             .show("Export sent!");
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                } else {
+                    personService.sendBerichtToTest();
+                    Notification notification = Notification
+                            .show("ONLY TEST SENT TO RECEIVER!");
+                    notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
                 }
             } catch (DocumentException | FileNotFoundException e) {
                 throw new RuntimeException(e);

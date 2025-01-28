@@ -131,12 +131,14 @@ public class PersonService implements EntityService<PersonDTO> {
                 .collect(Collectors.toList());
     }
 
-    public void sendEmailToActiven() {
-//        emailService.sendMail(this.findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
+    public void sendBerichtToRelevant() {
         this.findAll().stream()
-                .filter(PersonDTO::isNotAHAndHB)
                 .filter(PersonDTO::isExcelRelevant)
                 .forEach(o -> emailService.sendMail(o, EmailTemplates.BERICHT));
+    }
+
+    public void sendBerichtToTest() {
+        emailService.sendMail(findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
     }
 
     public void useSpende(SpendeDTO spende) {
