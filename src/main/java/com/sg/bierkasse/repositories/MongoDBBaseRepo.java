@@ -27,8 +27,6 @@ public abstract class MongoDBBaseRepo<T extends BaseEntity> implements EntityRep
             .readConcern(ReadConcern.MAJORITY)
             .writeConcern(WriteConcern.MAJORITY)
             .build();
-    private static final String DATABASE_NAME = "test";
-
     private final MongoClient client;
     MongoCollection<T> mongoCollection;
 
@@ -36,8 +34,8 @@ public abstract class MongoDBBaseRepo<T extends BaseEntity> implements EntityRep
         this.client = mongoClient;
     }
 
-    void init(String collectionName,  Class<T> aClass) {
-        mongoCollection = client.getDatabase(DATABASE_NAME).getCollection(collectionName, aClass);
+    void init(String databaseName, String collectionName,  Class<T> aClass) {
+        mongoCollection = client.getDatabase(databaseName).getCollection(collectionName, aClass);
     }
     public T save(T entity) {
         entity.setId(new ObjectId());

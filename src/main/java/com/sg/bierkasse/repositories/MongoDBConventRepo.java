@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 public class MongoDBConventRepo extends MongoDBBaseRepo<ConventEntity> {
 
     public static final String COLLECTION_NAME = "convente";
+    private static final String DATABASE_NAME = "test";
 
     public MongoDBConventRepo(MongoClient mongoClient) {
         super(mongoClient);
@@ -17,6 +18,6 @@ public class MongoDBConventRepo extends MongoDBBaseRepo<ConventEntity> {
 
     @PostConstruct
     void init() {
-        init(COLLECTION_NAME, ConventEntity.class);
+        init(DATABASE_NAME, COLLECTION_NAME, ConventEntity.class);
     }
 }

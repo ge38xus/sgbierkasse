@@ -17,6 +17,8 @@ import static com.mongodb.client.model.Updates.set;
 public class MongoDBPersonRepo extends MongoDBBaseRepo<PersonEntity> {
 
     public static final String COLLECTION_NAME = "data";
+    private static final String DATABASE_NAME = "test";
+
 
     public MongoDBPersonRepo(MongoClient mongoClient) {
         super(mongoClient);
@@ -24,7 +26,7 @@ public class MongoDBPersonRepo extends MongoDBBaseRepo<PersonEntity> {
 
     @PostConstruct
     void init() {
-        init(COLLECTION_NAME, PersonEntity.class);
+        init(DATABASE_NAME, COLLECTION_NAME, PersonEntity.class);
     }
 
     public void pushBill(PersonEntity personEntity, BillEntity billEntity) {
