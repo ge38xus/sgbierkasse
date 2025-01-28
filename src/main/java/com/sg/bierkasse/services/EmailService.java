@@ -4,6 +4,7 @@ import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.utils.Utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.activation.DataHandler;
@@ -21,9 +22,11 @@ import java.util.Properties;
 
 @Service
 public class EmailService {
-    String myAccount = "bierkasse.sg@gmail.com"; // GMail-Sender
-    String myPassword = "edpsxkoqyppccqat ";
-    Session session = null;
+    private static final String myAccount = "bierkasse.sg@gmail.com";
+    private Session session = null;
+
+    @Value("${spring.emailservice.password}")
+    private String myPassword;
 
     public EmailService() {
         initConnection();
@@ -47,7 +50,7 @@ public class EmailService {
     public void sendMail(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) {
         try {
             if (!personDTO.getEmail().isEmpty()) {
-                Message message = prepareMessage(session, myAccount, personDTO, billDTO, emailTemplate);
+                Message message = prepareMessage(session, personDTO, billDTO, emailTemplate);
                 Transport.send(message); // E-Mail senden!
             }
         } catch (Exception e1) {
@@ -60,7 +63,7 @@ public class EmailService {
     }
 
     private static Message prepareMessage(
-            Session session, String myAccount, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws Exception{
+            Session session, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws Exception{
         Message message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(myAccount, "Bierkasse S-G!"));
