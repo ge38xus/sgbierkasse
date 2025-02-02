@@ -4,6 +4,7 @@ import com.sg.bierkasse.dtos.*;
 import com.sg.bierkasse.repositories.MongoDBPersonRepo;
 import com.sg.bierkasse.utils.EmailTemplates;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -14,6 +15,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class PersonService implements EntityService<PersonDTO> {
+
+    @Value("${spring.settings.masteruserid}")
+    private String MASTER_USER_ID;
 
     private final MongoDBPersonRepo entityRepository;
     private final EmailService emailService;
@@ -142,11 +146,11 @@ public class PersonService implements EntityService<PersonDTO> {
     }
 
     public void sendBerichtToTest() throws MessagingException, IOException {
-        emailService.sendMail(findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
+        emailService.sendMail(findOne(MASTER_USER_ID), EmailTemplates.BERICHT);
     }
 
     public void useSpende(SpendeDTO spende) {
-        // ToDo:
+        // ToDo: implement this
         throw new NotImplementedException("Not implemented yet");
     }
 }

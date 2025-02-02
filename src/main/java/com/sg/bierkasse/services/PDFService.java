@@ -9,6 +9,7 @@ import com.sg.bierkasse.dtos.BierstandDTO;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
+import org.springframework.beans.factory.annotation.Value;
 import com.sg.bierkasse.utils.helpers.FormatUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +23,12 @@ import static com.sg.bierkasse.views.exportviews.PDFUtils.*;
 @Service
 public class PDFService {
 
-    private static final String BIERKASSEIBAN = "DE92 5002 4024 7529 7915 31";
-    private static final String PAYPALKONTO = "bierkasse.sg@gmail.com";
+    @Value("${spring.settings.payment.iban}")
+    private String BIERKASSEIBAN;
+    @Value("${spring.settings.payment.paypal}")
+    private String PAYPALKONTO;
+    @Value("${spring.settings.inhabername}")
+    private String INHABER;
 
     private final PersonService personService;
     private final StatisticsService statisticsService;
@@ -167,7 +172,7 @@ public class PDFService {
         iban.setBorderWidth(0);
         iban.setPhrase(new Phrase("Bierkasse S-G!", footerFont));
         table.addCell(iban);
-        iban.setPhrase(new Phrase("Inhaber: Tadeusz Czyzewicz", footerFont));
+        iban.setPhrase(new Phrase("Inhaber: " + INHABER, footerFont));
         table.addCell(iban);
         iban.setPhrase(new Phrase("IBAN: " + BIERKASSEIBAN, footerFont));
         table.addCell(iban);
