@@ -1,7 +1,7 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.BillEntity;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 
 import java.util.Date;
 
@@ -30,11 +30,11 @@ public record BillDTO(
     }
 
     public String formattedDate() {
-        return Utils.formatDateToDisplay(date);
+        return FormatUtils.formatDateToDisplay(date);
     }
 
     public String formattedValue() {
-        return Utils.formatDoubleToEuro(value);
+        return FormatUtils.formatDoubleToEuro(value);
     }
 
     public boolean isConsumptionBill(){

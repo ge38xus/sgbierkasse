@@ -10,6 +10,7 @@ import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
@@ -22,7 +23,8 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.bson.types.ObjectId;
 
-import java.io.FileNotFoundException;
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +37,6 @@ import java.util.stream.Collectors;
 public class PDFCreator extends Composite<VerticalLayout> {
 
     private final PersonService personService;
-
     private final ConventService conventService;
     private final PDFService pdfService;
 
@@ -75,7 +76,7 @@ public class PDFCreator extends Composite<VerticalLayout> {
     }
 
     private HorizontalLayout generateFooter() {
-        sendCheckbox = new Checkbox("Versende Bericht Relevante User");
+        sendCheckbox = new Checkbox("Versende Bericht");
         sendCheckbox.setValue(false);
         sendCheckbox.setEnabled(false);
         testBerichtCheckbox = new Checkbox("*Testbericht");
@@ -99,30 +100,37 @@ public class PDFCreator extends Composite<VerticalLayout> {
         export.addClickListener(o -> {
             try {
                 pdfService.createPDFOverview();
-                if (!testBerichtCheckbox.getValue()) {
-                    ConventDTO conventDTO = new ConventDTO(new ObjectId(), new Date(), "");
-                    conventService.save(conventDTO);
-                    Notification notification = Notification
-                            .show("Export saved!");
-                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                }
                 if (sendCheckbox.getValue()) {
-                    personService.sendBerichtToRelevant();
-                    Notification notification = Notification
-                            .show("Export sent!");
-                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    ConfirmDialog confirmDialog = new ConfirmDialog();
+                    confirmDialog.setHeader("Erstellen & Versenden von Bericht");
+                    confirmDialog.setText("Bist du Dir sicher, dass du ein neues Abrechungzeitraum definieren möchtest und anschließend das Bericht über das letzte Abrechnungzeitraum an alle eingetragene F, CB, iaCB und andere entsprechend markierte Nutzer verschicken möchtest?");
+                    confirmDialog.setConfirmText("Neues Abrechnungsraum starten & Bericht verschicken");
+                    confirmDialog.setRejectText("Cancel");
+                    confirmDialog.open();
+                    confirmDialog.addConfirmListener(o2 -> {
+                        if (!testBerichtCheckbox.getValue()) {
+                            ConventDTO conventDTO = new ConventDTO(new ObjectId(), new Date(), "");
+                            conventService.save(conventDTO);
+                            Notification notification = Notification
+                                    .show("Neue Abrechnungperiode wurde definiert!");
+                            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                        }
+                        personService.sendBerichtToRelevant();
+                        Notification notification = Notification
+                                .show("Bericht wurde versendet!");
+                        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    });
                 } else {
                     personService.sendBerichtToTest();
                     Notification notification = Notification
                             .show("ONLY TEST SENT TO RECEIVER!");
                     notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
                 }
-            } catch (DocumentException | FileNotFoundException e) {
-                throw new RuntimeException(e);
+            } catch (DocumentException | MessagingException | IOException e) {
+                Notification notification = Notification.show("Fehler: " + e.getMessage());
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
         return export;
     }
-
-
 }

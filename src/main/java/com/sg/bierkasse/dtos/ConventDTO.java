@@ -1,7 +1,7 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.ConventEntity;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ public record ConventDTO(
     }
 
     public String formattedDate() {
-        return Utils.formatDateToDisplay(date);
+        return FormatUtils.formatDateToDisplay(date);
     }
 
     public ConventEntity toConventEntity() {

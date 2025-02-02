@@ -1,6 +1,7 @@
 package com.sg.bierkasse.views.components;
 
 import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.PersonDTO;
 import com.vaadin.flow.component.grid.Grid;
 
 public class BillOverviewComponent extends Grid<BillDTO> {
@@ -17,6 +18,16 @@ public class BillOverviewComponent extends Grid<BillDTO> {
         getColumnByKey("summe").
                 setClassNameGenerator(summe -> summe.value() >= 0 ? "c-green" : "c-red");
 
+    }
+
+    public BillOverviewComponent(UserComboBox userComboBox) {
+        this();
+        userComboBox.addValueChangeListener(o -> {
+            if (!userComboBox.isEmpty()) {
+                PersonDTO personToChange = userComboBox.getValue().value();
+                setItems(personToChange.getBills().stream().sorted().toList());
+            }
+        });
     }
 
 }

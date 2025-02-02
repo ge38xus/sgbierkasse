@@ -3,9 +3,10 @@ package com.sg.bierkasse.views.overviews;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.services.PersonService;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.utils.PersonRecord;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.components.BillOverviewComponent;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -35,13 +36,13 @@ public class BillOverview extends Composite<VerticalLayout> {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 
         Grid<BillDTO> grid = new BillOverviewComponent();
-        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        ComboBox<PersonRecord> comboBox = UIUtils.getComboBoxWithPersonDTOData(personService.findAll());
         H4 h3 = new H4();
         comboBox.addValueChangeListener(o -> {
             String chosenPersonId = o.getValue().value().getId();
             PersonDTO chosenPerson = personService.findOne(chosenPersonId);
             grid.setItems(chosenPerson.getBills());
-            h3.setText("Kassenstand: " + Utils.formatDoubleToEuro(chosenPerson.getBalance()));
+            h3.setText("Kassenstand: " + FormatUtils.formatDoubleToEuro(chosenPerson.getBalance()));
         });
         horizontalLayout.add(comboBox);
         horizontalLayout.add(h3);

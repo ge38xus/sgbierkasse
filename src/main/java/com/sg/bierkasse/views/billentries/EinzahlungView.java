@@ -2,21 +2,17 @@ package com.sg.bierkasse.views.billentries;
 
 
 import com.sg.bierkasse.dtos.BillDTO;
-import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
-import com.sg.bierkasse.utils.PersonRecord;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.views.components.BenachrichtigungCheckbox;
 import com.sg.bierkasse.views.components.BillOverviewComponent;
+import com.sg.bierkasse.views.components.UserComboBox;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
@@ -31,6 +27,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.RolesAllowed;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Date;
 
 @PageTitle("Einzahlung")
@@ -39,25 +37,25 @@ import java.util.Date;
 @RolesAllowed("ADMIN")
 public class EinzahlungView extends Composite<VerticalLayout> {
 
+    private final UserComboBox userComboBox;
+    private final BenachrichtigungCheckbox benachrichtigungCheckbox;
+    private final NumberField price;
+
+    private final PersonService personService;
+
     public EinzahlungView(PersonService personService) {
+        this.personService = personService;
+        this.userComboBox = new UserComboBox(personService);
+        BillOverviewComponent grid = new BillOverviewComponent(userComboBox);
+        this.benachrichtigungCheckbox = new BenachrichtigungCheckbox(userComboBox);
+
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();
-        Grid<BillDTO> grid = new BillOverviewComponent();
-        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
-        comboBox.addValueChangeListener(o -> {
-            if (!comboBox.isEmpty()) {
-                PersonDTO personToChange = comboBox.getValue().value();
-                grid.setItems(personToChange.getBills().stream().sorted().toList());
-            }
-        });
-        NumberField price = new NumberField();
-        Checkbox checkbox = new Checkbox();
-        checkbox.setLabel("Benachrichtigen");
-        checkbox.setValue(true);
+
+        price = new NumberField();
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
-        Button buttonSecondary = new Button();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -78,38 +76,37 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         buttonPrimary.setWidth("min-content");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        buttonPrimary.addClickListener(o -> {
-            double value = price.getValue();
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", value, new Date());
-            PersonDTO personToChange = comboBox.getValue().value();
-            if (value > 0) {
-                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_IN_MONEY, checkbox.getValue());
-            } else if (value < 0) {
-                personService.pushBill(personToChange, billDTO, EmailTemplates.BOOK_OUT_MONEY, checkbox.getValue());
-            } else {
-                Notification notification = Notification
-                        .show("Failed!");
-                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                return;
-            }
-            price.setValue(0.0);
-            comboBox.setValue(comboBox.getEmptyValue());
-            Notification notification = Notification
-                    .show("Submitted!");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        });
+        buttonPrimary.addClickListener(o -> saveAndResetForm());
 
-        buttonSecondary.setText("Cancel");
-        buttonSecondary.setWidth("min-content");
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
-        formLayout2Col.add(comboBox);
+        formLayout2Col.add(userComboBox);
         formLayout2Col.add(price);
-        formLayout2Col.add(checkbox);
+        formLayout2Col.add(benachrichtigungCheckbox);
         layoutColumn2.add(layoutRow);
         layoutColumn2.add(grid);
         layoutRow.add(buttonPrimary);
-        layoutRow.add(buttonSecondary);
+    }
+
+    private void saveAndResetForm() {
+        try {
+            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", price.getValue(), new Date());
+
+            if (price.getValue() > 0) {
+                personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_IN_MONEY, benachrichtigungCheckbox.getValue());
+            } else {
+                personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_OUT_MONEY, benachrichtigungCheckbox.getValue());
+            }
+
+            price.setValue(0.0);
+            userComboBox.reset();
+
+            Notification notification = Notification.show("Einzahlung gespeichert!");
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        } catch (MessagingException | IOException e) {
+            Notification notification = Notification.show("Fehler: " + e.getMessage());
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 }

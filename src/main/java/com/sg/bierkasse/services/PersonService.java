@@ -6,6 +6,8 @@ import com.sg.bierkasse.utils.EmailTemplates;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,16 +82,12 @@ public class PersonService implements EntityService<PersonDTO> {
         return entityRepository.update(personEntities.stream().map(PersonDTO::toPersonEntity).toList());
     }
 
-    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate, boolean sendNotification) {
+    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate, boolean sendNotification) throws MessagingException, IOException {
         entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
         personDTO = this.findOne(personDTO.getId());
         if (sendNotification) {
             emailService.sendMail(personDTO, billDTO, emailTemplate);
         }
-    }
-
-    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) {
-        pushBill(personDTO, billDTO, emailTemplate, true);
     }
 
     public void pushRechnung(PersonDTO personDTO, RechnungDTO rechnungDTO) {
@@ -134,10 +132,16 @@ public class PersonService implements EntityService<PersonDTO> {
     public void sendBerichtToRelevant() {
         this.findAll().stream()
                 .filter(PersonDTO::isExcelRelevant)
-                .forEach(o -> emailService.sendMail(o, EmailTemplates.BERICHT));
+                .forEach(o -> {
+                    try {
+                        emailService.sendMail(o, EmailTemplates.BERICHT);
+                    } catch (MessagingException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
-    public void sendBerichtToTest() {
+    public void sendBerichtToTest() throws MessagingException, IOException {
         emailService.sendMail(findOne("662d6c939b1dd66748b79c06"), EmailTemplates.BERICHT);
     }
 

@@ -9,7 +9,7 @@ import com.sg.bierkasse.dtos.BierstandDTO;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -49,19 +49,19 @@ public class PDFService {
 
         document.open();
 
-        document.add(new Chunk("Bierkassenbericht zum " + Utils.formatDateToDisplay(new Date()), H1));
+        document.add(new Chunk("Bierkassenbericht zum " + FormatUtils.formatDateToDisplay(new Date()), H1));
         document.add(generateEmptyRow(30));
         document.add(this.generateBierkasseOverview());
         document.add(generateEmptyRow(20));
-        document.add(new Chunk("Bierkasse Summen " + statisticsService.getLastConvent().formattedDate() + " - " + Utils.formatDateToDisplay(new Date()) , H2));
+        document.add(new Chunk("Bierkasse Summen " + statisticsService.getLastConvent().formattedDate() + " - " + FormatUtils.formatDateToDisplay(new Date()) , H2));
         document.add(generateEmptyRow(5));
         document.add(this.generateStatistics());
         document.add(generateEmptyRow(20));
-        document.add(new Chunk("Kontostand Einzelpersonen zum " + Utils.formatDateToDisplay(new Date()) , H2));
+        document.add(new Chunk("Kontostand Einzelpersonen zum " + FormatUtils.formatDateToDisplay(new Date()) , H2));
         document.add(generateEmptyRow(5));
         document.add(this.generatePersonOverview());
         document.add(generateEmptyRow(20));
-        document.add(new Chunk("Ranking " + statisticsService.getLastConvent().formattedDate() + " - " + Utils.formatDateToDisplay(new Date()) , H2));
+        document.add(new Chunk("Ranking " + statisticsService.getLastConvent().formattedDate() + " - " + FormatUtils.formatDateToDisplay(new Date()) , H2));
         document.add(generateEmptyRow(5));
         document.add(this.generateRanking());
         document.add(generateEmptyRow(70));
@@ -78,11 +78,11 @@ public class PDFService {
 
     private void addStatisticsTableData(PdfPTable table) {
         double moneyInSum = statisticsService.getMoneyInSum();
-        table.addCell(generateCell(Utils.formatDoubleToEuro(moneyInSum), 0));
+        table.addCell(generateCell(FormatUtils.formatDoubleToEuro(moneyInSum), 0));
         double invoicesSum = statisticsService.getInvoicesSum();
-        table.addCell(generateCell(Utils.formatDoubleToEuro(invoicesSum), 0));
+        table.addCell(generateCell(FormatUtils.formatDoubleToEuro(invoicesSum), 0));
         double consumptionSum = statisticsService.getConsumptionSum();
-        table.addCell(generateCell(Utils.formatDoubleToEuro(consumptionSum), 0));
+        table.addCell(generateCell(FormatUtils.formatDoubleToEuro(consumptionSum), 0));
 
         table.completeRow();
     }

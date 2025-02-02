@@ -1,17 +1,17 @@
 package com.sg.bierkasse.views.billentries;
 
 import com.sg.bierkasse.dtos.BillDTO;
-import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
-import com.sg.bierkasse.utils.PersonRecord;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.UIUtils;
+import com.sg.bierkasse.views.components.BenachrichtigungCheckbox;
+import com.sg.bierkasse.views.components.MyIntegerField;
+import com.sg.bierkasse.views.components.UserComboBox;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
@@ -22,34 +22,45 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.Date;
 
 import static com.sg.bierkasse.dtos.BillDTO.*;
-import static com.sg.bierkasse.utils.Utils.createHorizontalRowLayout;
+import static com.sg.bierkasse.utils.helpers.UIUtils.createHorizontalRowLayout;
 
 @PageTitle("Abrechnung")
 @Route(value = "/", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
 public class AbrechnungView extends Composite<VerticalLayout> {
-    private final IntegerField blue;
-    private final IntegerField red;
-    private final IntegerField white;
-    private final IntegerField green;
+
+    private final UserComboBox userComboBox;
+    private final BenachrichtigungCheckbox benachrichtigungCheckbox;
+    private final MyIntegerField blue;
+    private final MyIntegerField red;
+    private final MyIntegerField white;
+    private final MyIntegerField green;
     private final NumberField greenValue;
+    private final TextField textField;
+
+    private final PersonService personService;
 
     public AbrechnungView(PersonService personService) {
+        this.personService = personService;
+
+        userComboBox = new UserComboBox(personService);
+        benachrichtigungCheckbox = new BenachrichtigungCheckbox(userComboBox);
+
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         VerticalLayout layoutColumn3 = new VerticalLayout();
-        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
 
         HorizontalLayout layoutRowBottles = createHorizontalRowLayout();
         HorizontalLayout layoutRowWine = createHorizontalRowLayout();
@@ -60,37 +71,19 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         value.setText("Summe: 0€");
         HasValue.ValueChangeListener valueChangeListener = valueChangeEvent -> value.setText("Summe: " + calculateValue() + "€");
 
-        blue = Utils.getIntegerField("Blaue Ringe", valueChangeListener);
-        red = Utils.getIntegerField("Rote Ringe", valueChangeListener);
-        white = Utils.getIntegerField("Weiße Ringe", valueChangeListener);
-        green = Utils.getIntegerField("Grüne Ringe", valueChangeListener);
-        greenValue = Utils.getEuroField("Grün Wert");
+        blue = new MyIntegerField("Blaue Ringe", valueChangeListener);
+        red = new MyIntegerField("Rote Ringe", valueChangeListener);
+        white = new MyIntegerField("Weiße Ringe", valueChangeListener);
+        green = new MyIntegerField("Grüne Ringe", valueChangeListener);
+        greenValue = UIUtils.getEuroField("Grün Wert");
         greenValue.setValue(GREEN_VALUE_DEFAULT);
 
-        TextField textField = new TextField();
+        textField = new TextField();
         textField.setLabel("Beschreibung Grün");
         textField.setValue(GREEN_VALUE_DEFAULT_TEXT);
 
         Button save = new Button();
-        save.addClickListener(o -> {
-            int redCnt = red.getValue() != null ? red.getValue() : 0;
-            int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
-            int whiteCnt = white.getValue() != null ? white.getValue() : 0;
-            int greenCnt = green.getValue() != null ? green.getValue() : 0;
-            double greenV = greenValue.getValue();
-
-            BillDTO billDTO = new BillDTO(redCnt, blueCnt, whiteCnt, greenCnt, greenV, textField.getValue(), -calculateValue(), new Date());
-            PersonDTO personToChange = comboBox.getValue().value();
-            personService.pushBill(personToChange, billDTO, EmailTemplates.DRINKS_OVERVIEW);
-            comboBox.setValue(comboBox.getEmptyValue());
-            blue.setValue(0);
-            red.setValue(0);
-            white.setValue(0);
-            green.setValue(0);
-            Notification notification = Notification
-                    .show("Submitted!");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        });
+        save.addClickListener(o -> saveAndResetForm());
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -119,11 +112,12 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         layoutRowWine.add(textField);
         layoutRowSum.add(value);
         layoutRowControls.add(save);
+        layoutRowControls.add(benachrichtigungCheckbox);
 
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(layoutColumn3);
-        layoutColumn3.add(comboBox);
+        layoutColumn3.add(userComboBox);
         layoutColumn3.add(layoutRowBottles);
         layoutColumn3.add(layoutRowWine);
         layoutColumn3.add(layoutRowSum);
@@ -132,16 +126,33 @@ public class AbrechnungView extends Composite<VerticalLayout> {
 
     }
 
-    public double calculateValue() {
-        int redCnt = red.getValue() != null ? red.getValue() : 0;
-        int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
-        int whiteCnt = white.getValue() != null ? white.getValue() : 0;
-        int greenCnt = green.getValue() != null ? green.getValue() : 0;
-        double greenV = greenValue.getValue();
+    private void saveAndResetForm() {
+        try {
+            BillDTO billDTO = createBillDTO();
+            personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.DRINKS_OVERVIEW, benachrichtigungCheckbox.getValue());
 
-        return redCnt * RED_VALUE +
-                blueCnt * BLUE_VALUE +
-                whiteCnt * WHITE_VALUE +
-                greenCnt * greenV;
+            userComboBox.reset();
+            blue.setValue(0);
+            red.setValue(0);
+            white.setValue(0);
+            green.setValue(0);
+
+            Notification notification = Notification.show("Abrechnung gespeichert!");
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        } catch (MessagingException | IOException e) {
+            Notification notification = Notification.show("Fehler: " + e.getMessage());
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    public double calculateValue() {
+        return red.getIntValue() * RED_VALUE +
+                blue.getIntValue() * BLUE_VALUE +
+                white.getIntValue() * WHITE_VALUE +
+                green.getIntValue() * greenValue.getValue();
+    }
+
+    public BillDTO createBillDTO() {
+        return new BillDTO(red.getIntValue(), blue.getIntValue(), white.getIntValue(), green.getIntValue(), greenValue.getValue(), textField.getValue(), -calculateValue(), new Date());
     }
 }

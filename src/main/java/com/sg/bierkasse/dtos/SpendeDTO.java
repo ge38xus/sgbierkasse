@@ -1,7 +1,7 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.SpendeEntity;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 
 import java.util.Date;
 
@@ -23,15 +23,15 @@ public record SpendeDTO(
     }
 
     public String formattedDate() {
-        return Utils.formatDateToDisplay(date);
+        return FormatUtils.formatDateToDisplay(date);
     }
 
     public String formattedDatePayedOn() {
-        return Utils.formatDateToDisplay(payedOn);
+        return FormatUtils.formatDateToDisplay(payedOn);
     }
 
     public String formattedValue() {
-        return Utils.formatDoubleToEuro(value);
+        return FormatUtils.formatDoubleToEuro(value);
     }
 
     public int compareTo(Date other){

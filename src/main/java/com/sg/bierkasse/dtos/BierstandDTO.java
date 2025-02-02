@@ -1,7 +1,7 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.BierstandEntity;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -26,35 +26,35 @@ public record BierstandDTO(
     }
 
     public String formattedDate() {
-        return Utils.formatDateToDisplay(date);
+        return FormatUtils.formatDateToDisplay(date);
     }
 
     public String formattedSum() {
-        return Utils.formatDoubleToEuro(sum);
+        return FormatUtils.formatDoubleToEuro(sum);
     }
 
     public String formattedKassenStand() {
-        return Utils.formatDoubleToEuro(kassenStand);
+        return FormatUtils.formatDoubleToEuro(kassenStand);
     }
 
     public String formattedWein() {
-        return Utils.formatDoubleToEuro(wein);
+        return FormatUtils.formatDoubleToEuro(wein);
     }
 
     public String formattedSpenden() {
-        return Utils.formatDoubleToEuro(sumSpenden);
+        return FormatUtils.formatDoubleToEuro(sumSpenden);
     }
 
     public String formattedGuthaben() {
-        return Utils.formatDoubleToEuro(sumGuthaben);
+        return FormatUtils.formatDoubleToEuro(sumGuthaben);
     }
 
     public String formattedSchulden() {
-        return Utils.formatDoubleToEuro(sumSchulden);
+        return FormatUtils.formatDoubleToEuro(sumSchulden);
     }
 
     public String formattedRest() {
-        return Utils.formatDoubleToEuro(sonstiges);
+        return FormatUtils.formatDoubleToEuro(sonstiges);
     }
 
 

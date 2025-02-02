@@ -4,8 +4,9 @@ package com.sg.bierkasse.views.billentries;
 import com.sg.bierkasse.dtos.BierstandDTO;
 import com.sg.bierkasse.services.BierstandService;
 import com.sg.bierkasse.services.StatisticsService;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.MyIntegerField;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,7 +20,6 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -43,17 +43,17 @@ public class BierstandView extends Composite<VerticalLayout> {
         H3 h3 = new H3();
         VerticalLayout layoutColumn3 = new VerticalLayout();
 
-        HorizontalLayout layoutRowDatum = Utils.createHorizontalRowLayout();
-        HorizontalLayout layoutRowKeller = Utils.createHorizontalRowLayout();
+        HorizontalLayout layoutRowDatum = UIUtils.createHorizontalRowLayout();
+        HorizontalLayout layoutRowKeller = UIUtils.createHorizontalRowLayout();
 
         DatePicker datePicker = new DatePicker("Datum");
         datePicker.setLocale(new Locale("de", "DE"));
-        IntegerField blue = Utils.getIntegerField("Blaue Kisten");
-        IntegerField red = Utils.getIntegerField("Rote Kisten");
-        IntegerField white = Utils.getIntegerField("Weiße Kisten");
-        NumberField wein = Utils.getEuroField("Wein Wert");
-        NumberField sonstiges = Utils.getEuroField("Sonstiges");
-        NumberField kassenstand = Utils.getEuroField("Kassenstand");
+        MyIntegerField blue = new MyIntegerField("Blaue Kisten");
+        MyIntegerField red = new MyIntegerField("Rote Kisten");
+        MyIntegerField white = new MyIntegerField("Weiße Kisten");
+        NumberField wein = UIUtils.getEuroField("Wein Wert");
+        NumberField sonstiges = UIUtils.getEuroField("Sonstiges");
+        NumberField kassenstand = UIUtils.getEuroField("Kassenstand");
 
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button save = new Button();
@@ -70,9 +70,9 @@ public class BierstandView extends Composite<VerticalLayout> {
         grid.setItems(bierstandService.findAll());
         save.addClickListener(o -> {
             Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            int redCnt = red.getValue() != null ? red.getValue() : 0;
-            int blueCnt = blue.getValue() != null ? blue.getValue() : 0;
-            int whiteCnt = white.getValue() != null ? white.getValue() : 0;
+            int redCnt = red.getIntValue();
+            int blueCnt = blue.getIntValue();
+            int whiteCnt = white.getIntValue();
             double weinWert = wein.getValue() != null ? wein.getValue() : 0.0;
             double sonstigesWert = sonstiges.getValue() != null ? sonstiges.getValue() : 0.0;
             double kassenStand = kassenstand.getValue() != null ? kassenstand.getValue() : 0.0;

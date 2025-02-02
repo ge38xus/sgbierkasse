@@ -4,7 +4,7 @@ import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -43,7 +43,7 @@ public class EditNutzerView extends Composite<VerticalLayout> {
         TextField firstName = new TextField();
         TextField lastName = new TextField();
         EmailField emailField = new EmailField();
-        ComboBox<UserState> state = Utils.getComboBoxWithStatusData();
+        ComboBox<UserState> state = UIUtils.getComboBoxWithStatusData();
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         Checkbox excelRelevant = new Checkbox();
@@ -68,7 +68,7 @@ public class EditNutzerView extends Composite<VerticalLayout> {
             }
         });
 
-        ComboBox<PersonRecord> comboBox = Utils.getComboBoxWithPersonDTOData(personService.findAll());
+        ComboBox<PersonRecord> comboBox = UIUtils.getComboBoxWithPersonDTOData(personService.findAll());
         comboBox.addValueChangeListener(o -> {
             if (!comboBox.isEmpty()) {
                 personDTO = comboBox.getValue().value();

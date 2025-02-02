@@ -2,13 +2,12 @@ package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.PersonEntity;
 import com.sg.bierkasse.utils.UserState;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 import org.bson.types.ObjectId;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.ToIntFunction;
 
 
@@ -127,7 +126,7 @@ public class PersonDTO {
     }
 
     public String getFormattedBalance() {
-        return Utils.formatDoubleToEuro(getBalance());
+        return FormatUtils.formatDoubleToEuro(getBalance());
     }
     public int compareTo(PersonDTO other) {
         int i = UserState.valueOf(state).compareTo(UserState.valueOf(other.state));
@@ -142,7 +141,7 @@ public class PersonDTO {
                     .filter(o -> (o.value() > 0))
                     .sorted(Comparator.comparing(BillDTO::date).reversed())
                     .map(BillDTO::date)
-                    .map(Utils::formatDateToDisplay)
+                    .map(FormatUtils::formatDateToDisplay)
                     .findFirst().orElse(" - ");
         }
         return " - ";
@@ -157,7 +156,7 @@ public class PersonDTO {
            for (int i = bills.size() - 1; i >= 0; i--) {
                balance -= bills.get(i).value();
                if (balance >= 0) {
-                   return Utils.formatDateToDisplay(bills.get(i).date());
+                   return FormatUtils.formatDateToDisplay(bills.get(i).date());
                }
            }
         }
@@ -169,9 +168,5 @@ public class PersonDTO {
                 .filter(billDTO -> billDTO.date().after(conventDate))
                 .mapToInt(billDTOToIntFunction)
                 .sum();
-    }
-
-    public boolean isNotAHAndHB() {
-        return !Objects.equals(this.state, UserState.AH.name) && !Objects.equals(this.state, UserState.HB.name) && (!Objects.equals(this.state, UserState.S.name)) || this.berichtReceiver;
     }
 }

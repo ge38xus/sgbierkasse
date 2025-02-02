@@ -3,7 +3,8 @@ package com.sg.bierkasse.services;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.EmailTemplates;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
+import com.sg.bierkasse.utils.helpers.PDFUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,8 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
@@ -47,28 +46,24 @@ public class EmailService {
         });
     }
 
-    public void sendMail(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) {
-        try {
-            if (!personDTO.getEmail().isEmpty()) {
-                Message message = prepareMessage(session, personDTO, billDTO, emailTemplate);
-                Transport.send(message); // E-Mail senden!
-            }
-        } catch (Exception e1) {
-            e1.printStackTrace();
+    public void sendMail(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws MessagingException, IOException {
+        if (!personDTO.getEmail().isEmpty()) {
+            Message message = prepareMessage(session, personDTO, billDTO, emailTemplate);
+            Transport.send(message); // E-Mail senden!
         }
     }
 
-    public void sendMail(PersonDTO personDTO, EmailTemplates emailTemplate) {
+    public void sendMail(PersonDTO personDTO, EmailTemplates emailTemplate) throws MessagingException, IOException {
         this.sendMail(personDTO, null, emailTemplate);
     }
 
     private static Message prepareMessage(
-            Session session, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws Exception{
+            Session session, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws IOException, MessagingException {
         Message message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(myAccount, "Bierkasse S-G!"));
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(personDTO.getEmail()));
-        String subject = emailTemplate.subject.replace("${current-date}", Utils.formatDateToDisplay(new Date()));
+        String subject = emailTemplate.subject.replace("${current-date}", FormatUtils.formatDateToDisplay(new Date()));
         message.setSubject(subject);
 
         MimeMultipart multipart = new MimeMultipart("related");
@@ -76,7 +71,7 @@ public class EmailService {
         BodyPart messageBodyPart = new MimeBodyPart();
         Path path = Path.of(emailTemplate.pathToFile);
         String someHtmlMessage = Files.readString(path);
-        someHtmlMessage = Utils.replaceHtmlTemplateVariables(someHtmlMessage, personDTO, billDTO);
+        someHtmlMessage = PDFUtils.replaceHtmlTemplateVariables(someHtmlMessage, personDTO, billDTO);
         messageBodyPart.setContent(someHtmlMessage, "text/html; charset=utf-8");
         multipart.addBodyPart(messageBodyPart);
 

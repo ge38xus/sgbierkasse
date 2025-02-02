@@ -1,7 +1,7 @@
 package com.sg.bierkasse.dtos;
 
 import com.sg.bierkasse.entities.RechnungEntity;
-import com.sg.bierkasse.utils.Utils;
+import com.sg.bierkasse.utils.helpers.FormatUtils;
 
 import java.util.Date;
 
@@ -22,10 +22,10 @@ public record RechnungDTO(
     }
 
     public String formattedDate() {
-        return Utils.formatDateToDisplay(date);
+        return FormatUtils.formatDateToDisplay(date);
     }
 
     public String formattedValue() {
-        return Utils.formatDoubleToEuro(value);
+        return FormatUtils.formatDoubleToEuro(value);
     }
 }
