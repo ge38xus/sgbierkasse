@@ -6,17 +6,14 @@ import com.sg.bierkasse.services.BierstandService;
 import com.sg.bierkasse.services.StatisticsService;
 import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.MyDatePicker;
 import com.sg.bierkasse.views.components.MyIntegerField;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,9 +22,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.time.ZoneId;
 import java.util.Date;
-import java.util.Locale;
 
 import static com.sg.bierkasse.dtos.BillDTO.*;
 
@@ -37,39 +32,26 @@ import static com.sg.bierkasse.dtos.BillDTO.*;
 @RolesAllowed("ADMIN")
 public class BierstandView extends Composite<VerticalLayout> {
 
+    private final MyDatePicker datePicker = new MyDatePicker("Datum");
+    private final MyIntegerField blue = new MyIntegerField("Blaue Kisten");
+    private final MyIntegerField red = new MyIntegerField("Rote Kisten");
+    private final MyIntegerField white = new MyIntegerField("Weiße Kisten");
+    private final NumberField wein = UIUtils.getEuroField("Wein Wert");
+    private final NumberField sonstiges = UIUtils.getEuroField("Sonstiges");
+    private final NumberField kassenstand = UIUtils.getEuroField("Kassenstand");
+    private final Grid<BierstandDTO> grid = new Grid<>(BierstandDTO.class, false);
+    private final Button save = UIUtils.getSaveButton("Save");
+
+    private final BierstandService bierstandService;
+
+
     public BierstandView(BierstandService bierstandService, StatisticsService statisticsService) {
-        VerticalLayout layoutColumn = new VerticalLayout();
+        this.bierstandService = bierstandService;
 
-        H3 h3 = new H3();
-        VerticalLayout layoutColumn3 = new VerticalLayout();
+        this.initForm();
 
-        HorizontalLayout layoutRowDatum = UIUtils.createHorizontalRowLayout();
-        HorizontalLayout layoutRowKeller = UIUtils.createHorizontalRowLayout();
-
-        DatePicker datePicker = new DatePicker("Datum");
-        datePicker.setLocale(new Locale("de", "DE"));
-        MyIntegerField blue = new MyIntegerField("Blaue Kisten");
-        MyIntegerField red = new MyIntegerField("Rote Kisten");
-        MyIntegerField white = new MyIntegerField("Weiße Kisten");
-        NumberField wein = UIUtils.getEuroField("Wein Wert");
-        NumberField sonstiges = UIUtils.getEuroField("Sonstiges");
-        NumberField kassenstand = UIUtils.getEuroField("Kassenstand");
-
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button save = new Button();
-        Grid<BierstandDTO> grid = new Grid<>(BierstandDTO.class, false);
-        grid.addColumn(BierstandDTO::formattedDate).setHeader("Datum");
-        grid.addColumn(BierstandDTO::formattedKassenStand).setHeader("Kassenstand");
-        grid.addColumn(BierstandDTO::formattedSum).setHeader("Kellerwert");
-        grid.addColumn(BierstandDTO::roteKisten).setHeader("Rote Kisten");
-        grid.addColumn(BierstandDTO::blaueKisten).setHeader("Blaue Kisten");
-        grid.addColumn(BierstandDTO::weisseKisten).setHeader("Weiße Kisten");
-        grid.addColumn(BierstandDTO::formattedWein).setHeader("Wein Wert");
-        grid.addColumn(BierstandDTO::formattedRest).setHeader("Rest");
-
-        grid.setItems(bierstandService.findAll());
         save.addClickListener(o -> {
-            Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date date = datePicker.getPickedDate();
             int redCnt = red.getIntValue();
             int blueCnt = blue.getIntValue();
             int whiteCnt = white.getIntValue();
@@ -86,16 +68,30 @@ public class BierstandView extends Composite<VerticalLayout> {
                     statisticsService.getSpendenStandForDate(date), statisticsService.calculateAllPlusAccountsForDate(date),
                     statisticsService.calculateAllMinusAccountsForDate(date), kassenStand);
             bierstandService.save(bierstandDTO);
-            blue.setValue(0);
-            red.setValue(0);
-            white.setValue(0);
-            wein.setValue(0.0);
-            sonstiges.setValue(0.0);
-            Notification notification = Notification
-                    .show("Submitted!");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            grid.setItems(bierstandService.findAll());
+
+            this.resetForm();
+            UIUtils.showSuccessNotification();
         });
+    }
+
+    private void initForm() {
+        VerticalLayout layoutColumn = new VerticalLayout();
+        H3 header = new H3();
+
+        HorizontalLayout layoutRowDatum = UIUtils.createHorizontalRowLayout();
+        HorizontalLayout layoutRowKeller = UIUtils.createHorizontalRowLayout();
+        HorizontalLayout layoutRowControls = new HorizontalLayout();
+
+        grid.addColumn(BierstandDTO::formattedDate).setHeader("Datum");
+        grid.addColumn(BierstandDTO::formattedKassenStand).setHeader("Kassenstand");
+        grid.addColumn(BierstandDTO::formattedSum).setHeader("Kellerwert");
+        grid.addColumn(BierstandDTO::roteKisten).setHeader("Rote Kisten");
+        grid.addColumn(BierstandDTO::blaueKisten).setHeader("Blaue Kisten");
+        grid.addColumn(BierstandDTO::weisseKisten).setHeader("Weiße Kisten");
+        grid.addColumn(BierstandDTO::formattedWein).setHeader("Wein Wert");
+        grid.addColumn(BierstandDTO::formattedRest).setHeader("Rest");
+
+        grid.setItems(bierstandService.findAll());
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -104,23 +100,18 @@ public class BierstandView extends Composite<VerticalLayout> {
 
         layoutColumn.setWidth("100%");
         layoutColumn.setHeight("min-content");
-        layoutColumn.setFlexGrow(1.0, layoutColumn3);
+        layoutColumn.setFlexGrow(1.0, layoutRowDatum);
 
-        h3.setText("Bierkeller aufschreiben");
-        h3.setWidth("100%");
-
-        layoutColumn3.setWidthFull();
-        layoutColumn3.setWidth("100%");
-        layoutColumn3.setFlexGrow(1.0, layoutRowDatum);
-
-        save.setText("Save");
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        header.setText("Bierkeller aufschreiben");
+        header.setWidth("100%");
 
         getContent().add(layoutColumn);
         getContent().add(grid);
-        layoutColumn.add(h3);
-        layoutColumn.add(layoutColumn3);
-        layoutColumn3.add(layoutRowDatum);
+
+        layoutColumn.add(header);
+        layoutColumn.add(layoutRowDatum);
+        layoutColumn.add(layoutRowKeller);
+        layoutColumn.add(layoutRowControls);
 
         layoutRowDatum.add(datePicker);
         layoutRowDatum.add(kassenstand);
@@ -129,9 +120,15 @@ public class BierstandView extends Composite<VerticalLayout> {
         layoutRowKeller.add(white);
         layoutRowKeller.add(wein);
         layoutRowKeller.add(sonstiges);
+        layoutRowControls.add(save);
+    }
 
-        layoutColumn3.add(layoutRowKeller);
-        layoutColumn.add(layoutRow2);
-        layoutRow2.add(save);
+    private void resetForm() {
+        blue.setValue(0);
+        red.setValue(0);
+        white.setValue(0);
+        wein.setValue(0.0);
+        sonstiges.setValue(0.0);
+        grid.setItems(bierstandService.findAll());
     }
 }

@@ -4,6 +4,7 @@ package com.sg.bierkasse.views.billentries;
 import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
+import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
 import com.sg.bierkasse.views.components.BenachrichtigungCheckbox;
 import com.sg.bierkasse.views.components.BillOverviewComponent;
@@ -31,7 +32,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Date;
 
-@PageTitle("Einzahlung")
+@PageTitle("Ein-/Auszahlung")
 @Route(value = "book-money", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
@@ -40,7 +41,6 @@ public class EinzahlungView extends Composite<VerticalLayout> {
     private final UserComboBox userComboBox;
     private final BenachrichtigungCheckbox benachrichtigungCheckbox;
     private final NumberField price;
-
     private final PersonService personService;
 
     public EinzahlungView(PersonService personService) {
@@ -48,12 +48,12 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         this.userComboBox = new UserComboBox(personService);
         BillOverviewComponent grid = new BillOverviewComponent(userComboBox);
         this.benachrichtigungCheckbox = new BenachrichtigungCheckbox(userComboBox);
+        this.price = UIUtils.getEuroField("Ein-/Ausgezahlt");
 
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();
 
-        price = new NumberField();
         HorizontalLayout layoutRow = new HorizontalLayout();
         Button buttonPrimary = new Button();
         getContent().setWidth("100%");
@@ -67,8 +67,6 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         h3.setWidth("100%");
         formLayout2Col.setWidth("100%");
 
-        price.setLabel("Eingezahlt");
-        price.setWidth("min-content");
         layoutRow.addClassName(Gap.MEDIUM);
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
@@ -102,8 +100,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
             price.setValue(0.0);
             userComboBox.reset();
 
-            Notification notification = Notification.show("Einzahlung gespeichert!");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            UIUtils.showSuccessNotification();
         } catch (MessagingException | IOException e) {
             Notification notification = Notification.show("Fehler: " + e.getMessage());
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);

@@ -3,19 +3,16 @@ package com.sg.bierkasse.views.overviews;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.RechnungDTO;
 import com.sg.bierkasse.services.PersonService;
-import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.MyDatePicker;
+import com.sg.bierkasse.views.components.UserComboBox;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -24,87 +21,85 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Locale;
-
 @PageTitle("Rechnungen")
 @Route(value = "invoices", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
 public class RechnungView extends Composite<VerticalLayout> {
 
-    PersonService personService;
+    private final PersonService personService;
+    private final MyDatePicker datePicker = new MyDatePicker("Rechnungs Datum");
+    private final NumberField price = UIUtils.getEuroField("Eingezahlt");
+    private final TextField descriptionField = new TextField("Beschreibung");
+    private final Checkbox checkbox = new Checkbox("Selbst bezahlt?");
+    private final Button saveButton = new Button("Save");
+    private final Grid<RechnungDTO> grid = new Grid<>(RechnungDTO.class, false);
+    private final UserComboBox userComboBox;
 
     public RechnungView(PersonService personService) {
+        this.personService = personService;
+        this.userComboBox = new UserComboBox(personService);
+
+        this.initPage();
+
+        userComboBox.addValueChangeListener(o -> {
+            PersonDTO chosenPerson = userComboBox.getSelected();
+            grid.setItems(chosenPerson.getInvoices());
+            setPanelVisibility(true);
+        });
+
+        saveButton.addClickListener(o -> {
+            RechnungDTO rechnungDTO = new RechnungDTO(price.getValue(), checkbox.getValue(), datePicker.getPickedDate(), descriptionField.getValue());
+            PersonDTO personToChange = userComboBox.getSelected();
+
+            personService.pushRechnung(personToChange, rechnungDTO);
+            grid.setItems(personService.findOne(personToChange.getId()).getInvoices());
+
+            this.resetForm();
+            UIUtils.showSuccessNotification();
+        });
+    }
+
+    private void initPage() {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 
-        this.personService = personService;
-
-        Grid<RechnungDTO> grid = new Grid<>(RechnungDTO.class, false);
         grid.addColumn(RechnungDTO::formattedDate).setHeader("Datum");
         grid.addColumn(RechnungDTO::formattedValue).setHeader("Summe");
         grid.addColumn(RechnungDTO::description).setHeader("Beschreibung");
         grid.addColumn(RechnungDTO::privateMoneyUsed).setHeader("Selbst Bezahlt?");
+        grid.setItems(personService.getAllRechnungDTOs());
 
-        grid.setItems(
-                personService.getAllRechnungDTOs()
-        );
-
-        ComboBox<PersonRecord> comboBox = UIUtils.getComboBoxWithPersonDTOData(personService.findAll());
-
-        DatePicker datePicker = new DatePicker("Rechnungsdatum");
-        datePicker.setLocale(new Locale("de", "DE"));
-        datePicker.setVisible(false);
-        NumberField numberField = new NumberField("Summe");
-        numberField.setVisible(false);
-        TextField descriptionField = new TextField("Beschreibung");
         descriptionField.setWidth("200%");
-        descriptionField.setVisible(false);
-        Checkbox checkbox = new Checkbox("Selbst bezahlt?");
-        checkbox.setVisible(false);
-        Button addRechnung = new Button("Save");
-        addRechnung.setVisible(false);
+        setPanelVisibility(false);
 
-        comboBox.addValueChangeListener(o -> {
-            String chosenPersonId = (o.getValue()).value().getId();
-            PersonDTO chosenPerson = personService.findOne(chosenPersonId);
-            grid.setItems(chosenPerson.getInvoices());
-            datePicker.setVisible(true);
-            numberField.setVisible(true);
-            descriptionField.setVisible(true);
-            checkbox.setVisible(true);
-            addRechnung.setVisible(true);
-        });
-
-        addRechnung.addClickListener(o -> {
-            Date date = Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            RechnungDTO rechnungDTO = new RechnungDTO(numberField.getValue(), checkbox.getValue(), date, descriptionField.getValue());
-            PersonDTO personToChange = comboBox.getValue().value();
-
-            personService.pushRechnung(personToChange, rechnungDTO);
-            datePicker.setValue(null);
-            descriptionField.setValue("");
-            numberField.setValue(0.0);
-
-            grid.setItems(personService.findOne(personToChange.getId()).getInvoices());
-
-            Notification notification = Notification
-                    .show("Submitted!");
-            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        });
-
-        horizontalLayout.add(comboBox);
+        horizontalLayout.add(userComboBox);
         horizontalLayout.add(datePicker);
-        horizontalLayout.add(numberField);
+        horizontalLayout.add(price);
         horizontalLayout.add(descriptionField);
         horizontalLayout.add(checkbox);
-        horizontalLayout.add(addRechnung);
+        horizontalLayout.add(saveButton);
 
         layoutColumn.add(horizontalLayout);
         layoutColumn.add(grid);
         layoutColumn.setHeight("100%");
         getContent().add(layoutColumn);
+    }
+
+    private void resetForm(){
+        datePicker.setValue(null);
+        descriptionField.setValue("");
+        price.setValue(0.0);
+        userComboBox.reset();
+
+        setPanelVisibility(false);
+    }
+
+    private void setPanelVisibility(boolean visibility) {
+        datePicker.setVisible(visibility);
+        price.setVisible(visibility);
+        descriptionField.setVisible(visibility);
+        checkbox.setVisible(visibility);
+        saveButton.setVisible(visibility);
     }
 }

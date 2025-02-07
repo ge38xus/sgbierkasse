@@ -3,8 +3,12 @@ package com.sg.bierkasse.utils.helpers;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -49,5 +53,17 @@ public class UIUtils {
         euroSuffix.setText("€");
         euroField.setSuffixComponent(euroSuffix);
         return euroField;
+    }
+
+    public static Button getSaveButton(String label) {
+        Button save = new Button();
+        save.setText(label);
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        return save;
+    }
+
+    public static void showSuccessNotification() {
+        Notification notification = Notification.show("Submitted!");
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 }
