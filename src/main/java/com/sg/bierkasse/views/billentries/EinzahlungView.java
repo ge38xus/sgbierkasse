@@ -43,12 +43,15 @@ public class EinzahlungView extends Composite<VerticalLayout> {
     private final NumberField price;
     private final PersonService personService;
 
+    private final BillOverviewComponent grid;
+
     public EinzahlungView(PersonService personService) {
         this.personService = personService;
         this.userComboBox = new UserComboBox(personService);
-        BillOverviewComponent grid = new BillOverviewComponent(userComboBox);
+        this.grid = new BillOverviewComponent(userComboBox);
         this.benachrichtigungCheckbox = new BenachrichtigungCheckbox(userComboBox);
         this.price = UIUtils.getEuroField("Ein-/Ausgezahlt");
+        this.price.setHelperText("Für Auszahlungen / Abbuchungen schreibe den Betrag mit '-'");
 
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
@@ -93,14 +96,15 @@ public class EinzahlungView extends Composite<VerticalLayout> {
 
             if (price.getValue() > 0) {
                 personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_IN_MONEY, benachrichtigungCheckbox.getValue());
+                UIUtils.showSuccessNotification(price.getValue() + " zu Konto von " + userComboBox.getSelected().getLastName() + " gebucht." );
             } else {
                 personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_OUT_MONEY, benachrichtigungCheckbox.getValue());
+                UIUtils.showSuccessNotification(price.getValue() + " von Konto von " + userComboBox.getSelected().getLastName() + " abgebucht.");
             }
 
             price.setValue(0.0);
             userComboBox.reset();
-
-            UIUtils.showSuccessNotification();
+            grid.reset();
         } catch (MessagingException | IOException e) {
             Notification notification = Notification.show("Fehler: " + e.getMessage());
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);

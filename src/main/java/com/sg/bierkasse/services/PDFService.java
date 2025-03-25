@@ -34,7 +34,7 @@ public class PDFService {
     private final StatisticsService statisticsService;
     private final BierstandService bierstandService;
 
-    private static final Integer NUMBER_OF_BIERSTANDS_TO_BE_INCLUDED = 5;
+    public static final Integer NUMBER_OF_BIERSTANDS_TO_BE_INCLUDED = 5;
     private static final List<String> PERSON_HEADERS = List.of("Status", "Name", "Kontostand", "Das letzte Mal eingezahlt am", "Das letzte mal im Plus am");
     private static final List<String> STATISTICS_HEADERS = List.of("Eingezahlt", "Bestellt", "Konsumiert");
     private static final List<String> RANKING_HEADERS = List.of("Blau Sieger", "Rot Sieger", "Weiß Sieger");

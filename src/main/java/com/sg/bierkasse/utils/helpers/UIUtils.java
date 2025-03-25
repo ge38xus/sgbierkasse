@@ -3,6 +3,7 @@ package com.sg.bierkasse.utils.helpers;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -55,6 +56,12 @@ public class UIUtils {
         return euroField;
     }
 
+    public static NumberField getEuroField(String label, HasValue.ValueChangeListener listener) {
+        NumberField euroField = getEuroField(label);
+        euroField.addValueChangeListener(listener);
+        return euroField;
+    }
+
     public static Button getSaveButton(String label) {
         Button save = new Button();
         save.setText(label);
@@ -64,6 +71,11 @@ public class UIUtils {
 
     public static void showSuccessNotification() {
         Notification notification = Notification.show("Submitted!");
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+    public static void showSuccessNotification(String message) {
+        Notification notification = Notification.show(message);
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 }

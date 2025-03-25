@@ -63,6 +63,7 @@ public class RechnungView extends Composite<VerticalLayout> {
     private void initPage() {
         VerticalLayout layoutColumn = new VerticalLayout();
         HorizontalLayout horizontalLayout = new HorizontalLayout();
+        checkbox.setTooltipText("Ankreuzen, wenn der Rechnungsbetrag dem Ausgewählten Säufer gutgeschrieben werden soll.");
 
         grid.addColumn(RechnungDTO::formattedDate).setHeader("Datum");
         grid.addColumn(RechnungDTO::formattedValue).setHeader("Summe");
@@ -84,6 +85,7 @@ public class RechnungView extends Composite<VerticalLayout> {
         layoutColumn.add(grid);
         layoutColumn.setHeight("100%");
         getContent().add(layoutColumn);
+        getContent().setHeight("100%");
     }
 
     private void resetForm(){

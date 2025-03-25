@@ -50,5 +50,6 @@ public class BillOverview extends Composite<VerticalLayout> {
         layoutColumn.add(grid);
         layoutColumn.setHeight("100%");
         getContent().add(layoutColumn);
+        getContent().setHeight("100%");
     }
 }

@@ -75,7 +75,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         red = new MyIntegerField("Rote Ringe", valueChangeListener);
         white = new MyIntegerField("Weiße Ringe", valueChangeListener);
         green = new MyIntegerField("Grüne Ringe", valueChangeListener);
-        greenValue = UIUtils.getEuroField("Grün Wert");
+        greenValue = UIUtils.getEuroField("Grün Wert", valueChangeListener);
         greenValue.setValue(GREEN_VALUE_DEFAULT);
 
         textField = new TextField();

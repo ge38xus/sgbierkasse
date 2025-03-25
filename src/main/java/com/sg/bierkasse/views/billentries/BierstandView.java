@@ -6,12 +6,12 @@ import com.sg.bierkasse.services.BierstandService;
 import com.sg.bierkasse.services.StatisticsService;
 import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.BierstandGrid;
 import com.sg.bierkasse.views.components.MyDatePicker;
 import com.sg.bierkasse.views.components.MyIntegerField;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -39,7 +39,7 @@ public class BierstandView extends Composite<VerticalLayout> {
     private final NumberField wein = UIUtils.getEuroField("Wein Wert");
     private final NumberField sonstiges = UIUtils.getEuroField("Sonstiges");
     private final NumberField kassenstand = UIUtils.getEuroField("Kassenstand");
-    private final Grid<BierstandDTO> grid = new Grid<>(BierstandDTO.class, false);
+    private final BierstandGrid grid;
     private final Button save = UIUtils.getSaveButton("Save");
 
     private final BierstandService bierstandService;
@@ -47,6 +47,7 @@ public class BierstandView extends Composite<VerticalLayout> {
 
     public BierstandView(BierstandService bierstandService, StatisticsService statisticsService) {
         this.bierstandService = bierstandService;
+        grid = new BierstandGrid(bierstandService);
 
         this.initForm();
 
@@ -82,16 +83,7 @@ public class BierstandView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRowKeller = UIUtils.createHorizontalRowLayout();
         HorizontalLayout layoutRowControls = new HorizontalLayout();
 
-        grid.addColumn(BierstandDTO::formattedDate).setHeader("Datum");
-        grid.addColumn(BierstandDTO::formattedKassenStand).setHeader("Kassenstand");
-        grid.addColumn(BierstandDTO::formattedSum).setHeader("Kellerwert");
-        grid.addColumn(BierstandDTO::roteKisten).setHeader("Rote Kisten");
-        grid.addColumn(BierstandDTO::blaueKisten).setHeader("Blaue Kisten");
-        grid.addColumn(BierstandDTO::weisseKisten).setHeader("Weiße Kisten");
-        grid.addColumn(BierstandDTO::formattedWein).setHeader("Wein Wert");
-        grid.addColumn(BierstandDTO::formattedRest).setHeader("Rest");
-
-        grid.setItems(bierstandService.findAll());
+        grid.init(false);
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");

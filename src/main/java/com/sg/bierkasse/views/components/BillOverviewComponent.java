@@ -4,6 +4,8 @@ import com.sg.bierkasse.dtos.BillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.vaadin.flow.component.grid.Grid;
 
+import java.util.ArrayList;
+
 public class BillOverviewComponent extends Grid<BillDTO> {
 
     public BillOverviewComponent() {
@@ -30,4 +32,7 @@ public class BillOverviewComponent extends Grid<BillDTO> {
         });
     }
 
+    public void reset() {
+        setItems(new ArrayList<>());
+    }
 }

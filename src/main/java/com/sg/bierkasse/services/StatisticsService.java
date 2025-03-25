@@ -6,6 +6,7 @@ import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.RechnungDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
 import com.sg.bierkasse.utils.UserState;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class StatisticsService {
 
+    @Value("${spring.settings.spendenuserid}")
     public static final String SPENDEN_USER_ID = "662d79bc151104579194f5b0";
 
     private final PersonService personService;
@@ -109,7 +111,8 @@ public class StatisticsService {
 
     public double calculateAllPlusAccountsForDate(Date date) {
         return Math.abs(personService.findAll().stream()
-                .filter(personDTO -> !Objects.equals(personDTO.getState(), UserState.AH.name))
+                .filter(personDTO -> !Objects.equals(personDTO.getState(), UserState.AH.name)
+                        && !Objects.equals(personDTO.getId(), SPENDEN_USER_ID))
                 .map(p -> p.getBalanceUpToDate(date))
                 .filter(o -> o >= 0)
                 .reduce((Double::sum))

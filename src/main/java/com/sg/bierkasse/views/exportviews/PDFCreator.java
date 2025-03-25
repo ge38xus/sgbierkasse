@@ -3,10 +3,12 @@ package com.sg.bierkasse.views.exportviews;
 import com.itextpdf.text.DocumentException;
 import com.sg.bierkasse.dtos.ConventDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
+import com.sg.bierkasse.services.BierstandService;
 import com.sg.bierkasse.services.ConventService;
 import com.sg.bierkasse.services.PDFService;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.BierstandGrid;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -43,13 +45,18 @@ public class PDFCreator extends Composite<VerticalLayout> {
     private Checkbox sendCheckbox;
     private Checkbox testBerichtCheckbox;
 
-    public PDFCreator(PersonService personService, ConventService conventService, PDFService pdfService) {
+    private Button exportButton;
+
+    public PDFCreator(PersonService personService, ConventService conventService, PDFService pdfService, BierstandService bierstandService) {
         this.personService = personService;
         this.pdfService = pdfService;
         this.conventService = conventService;
 
+        BierstandGrid grid = new BierstandGrid(bierstandService);
+        grid.init(true);
+        getContent().add(grid);
+        grid.setHeight("25%");
         getContent().add(generateGrid());
-
         getContent().add(generateFooter());
         getContent().setHeight("100%");
     }
@@ -72,27 +79,35 @@ public class PDFCreator extends Composite<VerticalLayout> {
                 .sorted(PersonDTO::compareTo)
                 .collect(Collectors.toList());
         grid.setItems(people);
+        grid.setHeight("60%");
         return grid;
     }
 
     private HorizontalLayout generateFooter() {
+        exportButton = generateExportButton();
         sendCheckbox = new Checkbox("Versende Bericht");
         sendCheckbox.setValue(false);
         sendCheckbox.setEnabled(false);
-        testBerichtCheckbox = new Checkbox("*Testbericht");
+        sendCheckbox.setTooltipText("Sendet Bericht an Alle vermerkten Nutzer und startet neuen Abrechnungsraum.");
+        sendCheckbox.addValueChangeListener(o -> checkEnable());
+        testBerichtCheckbox = new Checkbox("Testbericht");
+        testBerichtCheckbox.setTooltipText("Bericht wird nur an dem Admin nutzer geschickt und nicht in System abgelegt.");
         testBerichtCheckbox.setValue(true);
-        testBerichtCheckbox.addValueChangeListener(o -> {
-           if (sendCheckbox.getValue()) {
-               sendCheckbox.setValue(false);
-           }
-           sendCheckbox.setEnabled(!sendCheckbox.isEnabled());
-        });
+        testBerichtCheckbox.addValueChangeListener(o -> checkEnable());
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(generateExportButton());
+        horizontalLayout.add(exportButton);
         horizontalLayout.add(sendCheckbox);
         horizontalLayout.add(testBerichtCheckbox);
         return horizontalLayout;
+    }
+
+    private void checkEnable() {
+        sendCheckbox.setEnabled(!testBerichtCheckbox.getValue());
+        if (!sendCheckbox.isEnabled()) {
+            sendCheckbox.setValue(false);
+        }
+        exportButton.setEnabled(sendCheckbox.getValue() || testBerichtCheckbox.getValue());
     }
 
     private Button generateExportButton() {
