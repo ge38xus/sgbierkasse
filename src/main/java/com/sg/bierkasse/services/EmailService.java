@@ -83,8 +83,8 @@ public class EmailService {
         messageBodyPart.setContent(someHtmlMessage, "text/html; charset=utf-8");
         multipart.addBodyPart(messageBodyPart);
 
-        attachPicture(multipart, "sg-wappen", "src/main/resources/images/image-2.png");
-        attachPicture(multipart, "paypal", "src/main/resources/images/image-1.png");
+        attachPicture(multipart, "sg-wappen", "resources/images/image-2.png");
+        attachPicture(multipart, "paypal", "resources/images/image-1.png");
 
         if (emailTemplate == EmailTemplates.BERICHT) {
             attachPicture(multipart, "bierkassenbericht", "./Bierkassenbericht.pdf");
