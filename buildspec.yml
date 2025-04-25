@@ -1,10 +1,17 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      java: openjdk21
+  pre-build:
+    commands:
+      - mvn install
   build:
     commands:
-      - echo "Building app..."
       - mvn package
 artifacts:
   files:
-    - '**/*'
+    - 'target/Bierkasse-0.0.1-SNAPSHOT.jar'
+    - 'Dockerfile'
+    - 'src/main/resources/*'
