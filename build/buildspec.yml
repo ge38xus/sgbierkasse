@@ -4,16 +4,14 @@ phases:
   install:
     runtime-versions:
       java: corretto21
-  pre_build:
-    commands:
-      - mvn install
   build:
     commands:
       - mvn package
+      - cp build/appspec.yml .
 artifacts:
   files:
     - 'target/Bierkasse-0.0.1-SNAPSHOT.jar'
     - 'Dockerfile'
     - 'src/main/resources/*'
     - 'build/scripts/deploy.sh'
-    - 'build/appspec.yml'
+    - 'appspec.yml'
