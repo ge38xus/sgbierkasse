@@ -4,7 +4,7 @@ files:
   - source: /
     destination: /home/ec2-user/bierkasse
 hooks:
-  AfterInstall:
+  Install:
     - location: build/scripts/deploy.sh
       timeout: 300
       runas: ec2-user
