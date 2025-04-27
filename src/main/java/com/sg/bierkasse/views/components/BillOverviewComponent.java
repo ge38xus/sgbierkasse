@@ -12,6 +12,7 @@ public class BillOverviewComponent extends Grid<BillDTO> {
         super(BillDTO.class, false);
         addColumn(BillDTO::formattedDate).setHeader("Datum");
         addColumn(BillDTO::formattedValue).setHeader("Summe").setKey("summe");
+        addColumn(BillDTO::descr).setHeader("Beschreibung");
         addColumn(BillDTO::red).setHeader("Rot");
         addColumn(BillDTO::blue).setHeader("Blau");
         addColumn(BillDTO::white).setHeader("Weiß");

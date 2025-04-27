@@ -49,6 +49,8 @@ public class AbrechnungView extends Composite<VerticalLayout> {
     private final MyIntegerField green;
     private final NumberField greenValue;
     private final TextField textField;
+    private final TextField description;
+    private final String DESCRIPTION_VALUE_DEFAULT_TEXT = "Hacken Abrechnung";
 
     private final PersonService personService;
 
@@ -64,6 +66,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
 
         HorizontalLayout layoutRowBottles = createHorizontalRowLayout();
         HorizontalLayout layoutRowWine = createHorizontalRowLayout();
+        HorizontalLayout layoutRowDesc = createHorizontalRowLayout();
         HorizontalLayout layoutRowSum = createHorizontalRowLayout();
         HorizontalLayout layoutRowControls = createHorizontalRowLayout();
 
@@ -81,6 +84,10 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         textField = new TextField();
         textField.setLabel("Beschreibung Grün");
         textField.setValue(GREEN_VALUE_DEFAULT_TEXT);
+
+        description = new TextField();
+        description.setLabel("Beschreibung");
+        description.setValue(DESCRIPTION_VALUE_DEFAULT_TEXT);
 
         Button save = new Button();
         save.addClickListener(o -> saveAndResetForm());
@@ -110,6 +117,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         layoutRowWine.add(green);
         layoutRowWine.add(greenValue);
         layoutRowWine.add(textField);
+        layoutRowDesc.add(description);
         layoutRowSum.add(value);
         layoutRowControls.add(save);
         layoutRowControls.add(benachrichtigungCheckbox);
@@ -120,6 +128,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
         layoutColumn3.add(userComboBox);
         layoutColumn3.add(layoutRowBottles);
         layoutColumn3.add(layoutRowWine);
+        layoutColumn3.add(layoutRowDesc);
         layoutColumn3.add(layoutRowSum);
         layoutColumn3.add(layoutRowControls);
 
@@ -136,6 +145,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
             red.setValue(0);
             white.setValue(0);
             green.setValue(0);
+            description.setValue(DESCRIPTION_VALUE_DEFAULT_TEXT);
 
             Notification notification = Notification.show("Abrechnung gespeichert!");
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -153,6 +163,6 @@ public class AbrechnungView extends Composite<VerticalLayout> {
     }
 
     public BillDTO createBillDTO() {
-        return new BillDTO(red.getIntValue(), blue.getIntValue(), white.getIntValue(), green.getIntValue(), greenValue.getValue(), textField.getValue(), -calculateValue(), new Date());
+        return new BillDTO(red.getIntValue(), blue.getIntValue(), white.getIntValue(), green.getIntValue(), greenValue.getValue(), textField.getValue(), -calculateValue(), new Date(), description.getValue());
     }
 }

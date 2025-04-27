@@ -14,18 +14,20 @@ public class BillEntity {
     private int green;
     private double value;
     private Date date;
+    private String descr;
 
     public BillEntity() {
 
     }
 
-    public BillEntity(int red, int blue, int white, int green, double value, Date date) {
+    public BillEntity(int red, int blue, int white, int green, double value, Date date, String descr) {
         this.red = red;
         this.blue = blue;
         this.white = white;
         this.green = green;
         this.value = value;
         this.date = date;
+        this.descr = descr;
     }
 
     public int getRed() {
@@ -68,6 +70,14 @@ public class BillEntity {
         this.value = value;
     }
 
+    public String getDescr() {
+        return descr;
+    }
+
+    public void setDescr(String descr) {
+        this.descr = descr;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,7 +101,7 @@ public class BillEntity {
 
     @Override
     public String toString() {
-        return "Bill{red=" + red + ", blue=" + blue + ", white=" + white + ", green=" + green + ", date=" + date + "}";
+        return "Bill{red=" + red + ", blue=" + blue + ", white=" + white + ", green=" + green + ", date=" + date + ", descr=" + descr + "}";
     }
 
     public Date getDate() {

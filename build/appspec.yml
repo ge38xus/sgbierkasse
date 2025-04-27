@@ -6,9 +6,9 @@ files:
 hooks:
   ApplicationStop:
     - location: build/scripts/stop_docker.sh
-      timeout: 200
+      timeout: 30
       runas: ec2-user
   Install:
     - location: build/scripts/install_and_start.sh
-      timeout: 300
+      timeout: 60
       runas: ec2-user

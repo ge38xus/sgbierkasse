@@ -13,7 +13,8 @@ public record BillDTO(
         double greenValue,
         String greenText,
         double value,
-        Date date) implements Comparable<BillDTO> {
+        Date date,
+        String descr) implements Comparable<BillDTO> {
 
     public static final double BLUE_VALUE = 0.5;
     public static final double RED_VALUE = 1;
@@ -22,11 +23,11 @@ public record BillDTO(
     public static final String GREEN_VALUE_DEFAULT_TEXT = "Ring Grün";
 
     public BillDTO(BillEntity b) {
-        this(b.getRed(), b.getBlue(), b.getWhite(), b.getGreen(), GREEN_VALUE_DEFAULT, GREEN_VALUE_DEFAULT_TEXT, b.getValue(), b.getDate());
+        this(b.getRed(), b.getBlue(), b.getWhite(), b.getGreen(), GREEN_VALUE_DEFAULT, GREEN_VALUE_DEFAULT_TEXT, b.getValue(), b.getDate(), b.getDescr());
     }
 
     public BillEntity toBillEntity() {
-        return new BillEntity(red, blue, white, green, value, date);
+        return new BillEntity(red, blue, white, green, value, date, descr);
     }
 
     public String formattedDate() {

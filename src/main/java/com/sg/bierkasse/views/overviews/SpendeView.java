@@ -4,8 +4,8 @@ import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.SpendeDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.PersonRecord;
-import com.sg.bierkasse.utils.helpers.UIUtils;
 import com.sg.bierkasse.views.MainLayout;
+import com.sg.bierkasse.views.components.UserComboBox;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -79,7 +79,7 @@ public class SpendeView extends Composite<VerticalLayout> {
                 personService.getAllSpenden()
         );
 
-        ComboBox<PersonRecord> comboBox = UIUtils.getComboBoxWithPersonDTOData(personService.findAll());
+        ComboBox<PersonRecord> comboBox = new UserComboBox(personService);
 
         DatePicker datePicker = new DatePicker("SpendeDatum");
         datePicker.setLocale(new Locale("de", "DE"));

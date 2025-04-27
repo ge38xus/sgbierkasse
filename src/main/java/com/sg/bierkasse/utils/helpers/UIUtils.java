@@ -1,7 +1,5 @@
 package com.sg.bierkasse.utils.helpers;
 
-import com.sg.bierkasse.dtos.PersonDTO;
-import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.UserState;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
@@ -15,20 +13,8 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class UIUtils {
-    public static ComboBox<PersonRecord> getComboBoxWithPersonDTOData(List<PersonDTO> personDTOS) {
-        ComboBox<PersonRecord> comboBox = new ComboBox<>();
-        List<PersonRecord> sampleItems;
-        sampleItems = personDTOS.stream().sorted((o1, o2) -> o1.getLastName().compareTo(o2.getFirstName())).map(o -> new PersonRecord(o, o.getState() + " " + o.getLastName())).collect(Collectors.toList());
-        comboBox.setItems(sampleItems);
-        comboBox.setItemLabelGenerator(PersonRecord::label);
-        comboBox.setLabel("Säufer");
-        comboBox.setWidth("min-content");
-        return comboBox;
-    }
-
     public static ComboBox<UserState> getComboBoxWithStatusData() {
         ComboBox<UserState> comboBox = new ComboBox<>();
         List<UserState> sampleItems = List.of(UserState.values());

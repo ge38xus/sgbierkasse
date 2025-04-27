@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
@@ -41,9 +42,11 @@ public class EinzahlungView extends Composite<VerticalLayout> {
     private final UserComboBox userComboBox;
     private final BenachrichtigungCheckbox benachrichtigungCheckbox;
     private final NumberField price;
+    private final TextField description;
     private final PersonService personService;
-
     private final BillOverviewComponent grid;
+
+    private final String DESCRIPTION_VALUE_DEFAULT_TEXT_P = "Einzahlung ";
 
     public EinzahlungView(PersonService personService) {
         this.personService = personService;
@@ -52,6 +55,9 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         this.benachrichtigungCheckbox = new BenachrichtigungCheckbox(userComboBox);
         this.price = UIUtils.getEuroField("Ein-/Ausgezahlt");
         this.price.setHelperText("Für Auszahlungen / Abbuchungen schreibe den Betrag mit '-'");
+        this.description = new TextField();
+        this.description.setLabel("Beschreibung");
+        this.description.setValue(DESCRIPTION_VALUE_DEFAULT_TEXT_P);
 
         VerticalLayout layoutColumn2 = new VerticalLayout();
         H3 h3 = new H3();
@@ -84,6 +90,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(userComboBox);
         formLayout2Col.add(price);
+        formLayout2Col.add(description);
         formLayout2Col.add(benachrichtigungCheckbox);
         layoutColumn2.add(layoutRow);
         layoutColumn2.add(grid);
@@ -92,7 +99,7 @@ public class EinzahlungView extends Composite<VerticalLayout> {
 
     private void saveAndResetForm() {
         try {
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", price.getValue(), new Date());
+            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", price.getValue(), new Date(), description.getValue());
 
             if (price.getValue() > 0) {
                 personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_IN_MONEY, benachrichtigungCheckbox.getValue());

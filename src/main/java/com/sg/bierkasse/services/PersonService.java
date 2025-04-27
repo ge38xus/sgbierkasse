@@ -97,7 +97,7 @@ public class PersonService implements EntityService<PersonDTO> {
     public void pushRechnung(PersonDTO personDTO, RechnungDTO rechnungDTO) {
         entityRepository.pushRechnung(personDTO.toPersonEntity(), rechnungDTO.toRechnungEntity());
         if (rechnungDTO.privateMoneyUsed()) {
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0, 0, "", rechnungDTO.value() , rechnungDTO.date());
+            BillDTO billDTO = new BillDTO(0, 0, 0, 0, 0, "", rechnungDTO.value() , rechnungDTO.date(), rechnungDTO.description());
             entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
         }
     }
