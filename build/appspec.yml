@@ -4,7 +4,11 @@ files:
   - source: /
     destination: /home/ec2-user/bierkasse
 hooks:
+  ApplicationStop:
+    - location: build/scripts/stop_docker.sh
+      timeout: 200
+      runas: ec2-user
   Install:
-    - location: build/scripts/deploy.sh
+    - location: build/scripts/install_and_start.sh
       timeout: 300
       runas: ec2-user
