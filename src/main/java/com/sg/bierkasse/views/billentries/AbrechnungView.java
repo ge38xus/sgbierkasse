@@ -36,7 +36,7 @@ import static com.sg.bierkasse.dtos.BillDTO.*;
 import static com.sg.bierkasse.utils.helpers.UIUtils.createHorizontalRowLayout;
 
 @PageTitle("Abrechnung")
-@Route(value = "/", layout = MainLayout.class)
+@Route(value = "/count", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
 public class AbrechnungView extends Composite<VerticalLayout> {

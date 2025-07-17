@@ -30,6 +30,7 @@ public class UIUtils {
         layout.addClassName(LumoUtility.Gap.MEDIUM);
         layout.setWidth("100%");
         layout.getStyle().set("flex-grow", "1");
+        layout.getStyle().set("flex-wrap", "wrap");
         return layout;
     }
 

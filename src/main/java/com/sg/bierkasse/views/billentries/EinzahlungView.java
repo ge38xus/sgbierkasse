@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @PageTitle("Ein-/Auszahlung")
-@Route(value = "book-money", layout = MainLayout.class)
+@Route(value = "/", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed("ADMIN")
 public class EinzahlungView extends Composite<VerticalLayout> {

@@ -135,7 +135,7 @@ public class PersonService implements EntityService<PersonDTO> {
 
     public void sendBerichtToRelevant() {
         this.findAll().stream()
-                .filter(PersonDTO::isExcelRelevant)
+                .filter(PersonDTO::isBerichtReceiver)
                 .forEach(o -> {
                     try {
                         emailService.sendMail(o, EmailTemplates.BERICHT);
