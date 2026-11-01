@@ -86,19 +86,19 @@ public class PersonService implements EntityService<PersonDTO> {
         return entityRepository.update(personEntities.stream().map(PersonDTO::toPersonEntity).toList());
     }
 
-    public void pushBill(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate, boolean sendNotification) throws MessagingException, IOException {
-        entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
+    public void pushBeerBill(PersonDTO personDTO, BeerBillDTO beerBillDTO, EmailTemplates emailTemplate, boolean sendNotification) throws MessagingException, IOException {
+        entityRepository.pushBill(personDTO.toPersonEntity(), beerBillDTO.toBillEntity());
         personDTO = this.findOne(personDTO.getId());
         if (sendNotification) {
-            emailService.sendMail(personDTO, billDTO, emailTemplate);
+            emailService.sendMail(personDTO, beerBillDTO, emailTemplate);
         }
     }
 
-    public void pushRechnung(PersonDTO personDTO, RechnungDTO rechnungDTO) {
+    public void pushBeerRechnung(PersonDTO personDTO, RechnungDTO rechnungDTO) {
         entityRepository.pushRechnung(personDTO.toPersonEntity(), rechnungDTO.toRechnungEntity());
         if (rechnungDTO.privateMoneyUsed()) {
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0, 0, "", rechnungDTO.value() , rechnungDTO.date(), rechnungDTO.description());
-            entityRepository.pushBill(personDTO.toPersonEntity(), billDTO.toBillEntity());
+            BeerBillDTO beerBillDTO = new BeerBillDTO(0, 0, 0, 0, 0, "", rechnungDTO.value() , rechnungDTO.date(), rechnungDTO.description());
+            entityRepository.pushBill(personDTO.toPersonEntity(), beerBillDTO.toBillEntity());
         }
     }
 
@@ -110,7 +110,7 @@ public class PersonService implements EntityService<PersonDTO> {
         entityRepository.paySpende(spende.toSpendeEntity());
     }
 
-    public List<RechnungDTO> getAllRechnungDTOs(){
+    public List<RechnungDTO> getAllBierkassenRechnungDTOs(){
         return this.findAll().stream()
                 .map(PersonDTO::getInvoices)
                 .flatMap(List::stream)
@@ -118,11 +118,11 @@ public class PersonService implements EntityService<PersonDTO> {
                 .collect(Collectors.toList());
     }
 
-    public List<BillDTO> getAllBills(){
+    public List<BeerBillDTO> getAllBierkassenBills(){
         return this.findAll().stream()
                 .map(PersonDTO::getBills)
                 .flatMap(List::stream)
-                .sorted(Comparator.comparing(BillDTO::date))
+                .sorted(Comparator.comparing(BeerBillDTO::date))
                 .collect(Collectors.toList());
     }
 
@@ -133,20 +133,20 @@ public class PersonService implements EntityService<PersonDTO> {
                 .collect(Collectors.toList());
     }
 
-    public void sendBerichtToRelevant() {
+    public void sendBierkassenBerichtToRelevant() {
         this.findAll().stream()
-                .filter(PersonDTO::isBerichtReceiver)
+                .filter(PersonDTO::isBierkassenBerichtReceiver)
                 .forEach(o -> {
                     try {
-                        emailService.sendMail(o, EmailTemplates.BERICHT);
+                        emailService.sendMail(o, EmailTemplates.BIERKASSE_BERICHT);
                     } catch (MessagingException | IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
     }
 
-    public void sendBerichtToTest() throws MessagingException, IOException {
-        emailService.sendMail(findOne(MASTER_USER_ID), EmailTemplates.BERICHT);
+    public void sendBierkassenBerichtToTest() throws MessagingException, IOException {
+        emailService.sendMail(findOne(MASTER_USER_ID), EmailTemplates.BIERKASSE_BERICHT);
     }
 
     public void useSpende(SpendeDTO spende) {

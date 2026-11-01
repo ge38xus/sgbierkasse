@@ -24,7 +24,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Rechnungen")
 @Route(value = "invoices", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class RechnungView extends Composite<VerticalLayout> {
 
     private final PersonService personService;
@@ -52,7 +52,7 @@ public class RechnungView extends Composite<VerticalLayout> {
             RechnungDTO rechnungDTO = new RechnungDTO(price.getValue(), checkbox.getValue(), datePicker.getPickedDate(), descriptionField.getValue());
             PersonDTO personToChange = userComboBox.getSelected();
 
-            personService.pushRechnung(personToChange, rechnungDTO);
+            personService.pushBeerRechnung(personToChange, rechnungDTO);
             grid.setItems(personService.findOne(personToChange.getId()).getInvoices());
 
             this.resetForm();
@@ -69,7 +69,7 @@ public class RechnungView extends Composite<VerticalLayout> {
         grid.addColumn(RechnungDTO::formattedValue).setHeader("Summe");
         grid.addColumn(RechnungDTO::description).setHeader("Beschreibung");
         grid.addColumn(RechnungDTO::privateMoneyUsed).setHeader("Selbst Bezahlt?");
-        grid.setItems(personService.getAllRechnungDTOs());
+        grid.setItems(personService.getAllBierkassenRechnungDTOs());
 
         descriptionField.setWidth("200%");
         setPanelVisibility(false);

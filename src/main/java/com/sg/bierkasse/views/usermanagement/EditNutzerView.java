@@ -32,7 +32,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Neue Nutzer")
 @Route(value = "edit-person-form", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class EditNutzerView extends Composite<VerticalLayout> {
 
     private PersonDTO personDTO;
@@ -78,7 +78,7 @@ public class EditNutzerView extends Composite<VerticalLayout> {
                 emailField.setValue(personDTO.getEmail());
                 state.setValue(UserState.valueOf(personDTO.getState()));
                 excelRelevant.setValue(personDTO.isExcelRelevant());
-                berichtReceiver.setValue(personDTO.isBerichtReceiver());
+                berichtReceiver.setValue(personDTO.isBierkassenBerichtReceiver());
             }
         });
 

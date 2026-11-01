@@ -24,6 +24,7 @@ public class SecurityService {
     }
 
     public void logout() {
+        SecurityContext context = SecurityContextHolder.getContext();
         UI.getCurrent().getPage().setLocation(LOGOUT_SUCCESS_URL);
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(

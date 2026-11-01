@@ -32,7 +32,7 @@ import java.util.ArrayList;
 @PageTitle("Neue Nutzer")
 @Route(value = "person-form", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class NeueNutzerView extends Composite<VerticalLayout> {
 
     public NeueNutzerView(PersonService personService) {

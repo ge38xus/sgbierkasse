@@ -1,7 +1,7 @@
 package com.sg.bierkasse.repositories;
 
 import com.mongodb.client.MongoClient;
-import com.sg.bierkasse.entities.BillEntity;
+import com.sg.bierkasse.entities.bills.BeerBillEntity;
 import com.sg.bierkasse.entities.PersonEntity;
 import com.sg.bierkasse.entities.RechnungEntity;
 import com.sg.bierkasse.entities.SpendeEntity;
@@ -29,9 +29,9 @@ public class MongoDBPersonRepo extends MongoDBBaseRepo<PersonEntity> {
         init(DATABASE_NAME, COLLECTION_NAME, PersonEntity.class);
     }
 
-    public void pushBill(PersonEntity personEntity, BillEntity billEntity) {
+    public void pushBill(PersonEntity personEntity, BeerBillEntity beerBillEntity) {
         Bson filter = eq("_id", personEntity.getId());
-        Bson change = push("billEntities", billEntity);
+        Bson change = push("billEntities", beerBillEntity);
         mongoCollection.updateOne(filter, change);
     }
 

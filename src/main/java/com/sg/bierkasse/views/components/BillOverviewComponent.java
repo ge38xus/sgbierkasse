@@ -1,22 +1,22 @@
 package com.sg.bierkasse.views.components;
 
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.vaadin.flow.component.grid.Grid;
 
 import java.util.ArrayList;
 
-public class BillOverviewComponent extends Grid<BillDTO> {
+public class BillOverviewComponent extends Grid<BeerBillDTO> {
 
     public BillOverviewComponent() {
-        super(BillDTO.class, false);
-        addColumn(BillDTO::formattedDate).setHeader("Datum");
-        addColumn(BillDTO::formattedValue).setHeader("Summe").setKey("summe");
-        addColumn(BillDTO::descr).setHeader("Beschreibung");
-        addColumn(BillDTO::red).setHeader("Rot");
-        addColumn(BillDTO::blue).setHeader("Blau");
-        addColumn(BillDTO::white).setHeader("Weiß");
-        addColumn(BillDTO::green).setHeader("Grün");
+        super(BeerBillDTO.class, false);
+        addColumn(BeerBillDTO::formattedDate).setHeader("Datum");
+        addColumn(BeerBillDTO::formattedValue).setHeader("Summe").setKey("summe");
+        addColumn(BeerBillDTO::descr).setHeader("Beschreibung");
+        addColumn(BeerBillDTO::red).setHeader("Rot");
+        addColumn(BeerBillDTO::blue).setHeader("Blau");
+        addColumn(BeerBillDTO::white).setHeader("Weiß");
+        addColumn(BeerBillDTO::green).setHeader("Grün");
 
         getColumnByKey("summe").
                 setClassNameGenerator(summe -> summe.value() >= 0 ? "c-green" : "c-red");

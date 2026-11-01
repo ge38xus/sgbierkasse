@@ -1,7 +1,7 @@
 package com.sg.bierkasse.views.billentries;
 
 
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.utils.helpers.UIUtils;
@@ -36,7 +36,7 @@ import java.util.Date;
 @PageTitle("Ein-/Auszahlung")
 @Route(value = "/", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class EinzahlungView extends Composite<VerticalLayout> {
 
     private final UserComboBox userComboBox;
@@ -99,13 +99,13 @@ public class EinzahlungView extends Composite<VerticalLayout> {
 
     private void saveAndResetForm() {
         try {
-            BillDTO billDTO = new BillDTO(0, 0, 0, 0,0, "", price.getValue(), new Date(), description.getValue());
+            BeerBillDTO beerBillDTO = new BeerBillDTO(0, 0, 0, 0,0, "", price.getValue(), new Date(), description.getValue());
 
             if (price.getValue() > 0) {
-                personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_IN_MONEY, benachrichtigungCheckbox.getValue());
+                personService.pushBeerBill(userComboBox.getSelected(), beerBillDTO, EmailTemplates.BIERKASSE_BOOK_IN_MONEY, benachrichtigungCheckbox.getValue());
                 UIUtils.showSuccessNotification(price.getValue() + " zu Konto von " + userComboBox.getSelected().getLastName() + " gebucht." );
             } else {
-                personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.BOOK_OUT_MONEY, benachrichtigungCheckbox.getValue());
+                personService.pushBeerBill(userComboBox.getSelected(), beerBillDTO, EmailTemplates.BIERKASSE_BOOK_OUT_MONEY, benachrichtigungCheckbox.getValue());
                 UIUtils.showSuccessNotification(price.getValue() + " von Konto von " + userComboBox.getSelected().getLastName() + " abgebucht.");
             }
 

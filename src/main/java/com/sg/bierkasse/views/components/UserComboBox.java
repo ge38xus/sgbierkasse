@@ -6,6 +6,7 @@ import com.sg.bierkasse.utils.PersonRecord;
 import com.sg.bierkasse.utils.helpers.FormatUtils;
 import com.vaadin.flow.component.combobox.ComboBox;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class UserComboBox extends ComboBox<PersonRecord> {
         super();
         this.displayBalance = displayBalance;
         List<PersonRecord> sampleItems = personService.findAll().stream()
-                .sorted((o1, o2) -> o1.getLastName().compareTo(o2.getFirstName()))
+                .sorted(Comparator.comparing(PersonDTO::getLastName))
                 .map(this::mapToRecord)
                 .collect(Collectors.toList());
         setItems(sampleItems);

@@ -1,6 +1,6 @@
 package com.sg.bierkasse.services;
 
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.utils.helpers.FormatUtils;
@@ -54,9 +54,9 @@ public class EmailService {
         });
     }
 
-    public void sendMail(PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws MessagingException, IOException {
+    public void sendMail(PersonDTO personDTO, BeerBillDTO beerBillDTO, EmailTemplates emailTemplate) throws MessagingException, IOException {
         if (!personDTO.getEmail().isEmpty()) {
-            Message message = prepareMessage(session, personDTO, billDTO, emailTemplate);
+            Message message = prepareMessage(session, personDTO, beerBillDTO, emailTemplate);
             Transport.send(message);
         }
     }
@@ -66,7 +66,7 @@ public class EmailService {
     }
 
     private Message prepareMessage(
-            Session session, PersonDTO personDTO, BillDTO billDTO, EmailTemplates emailTemplate) throws IOException, MessagingException {
+            Session session, PersonDTO personDTO, BeerBillDTO beerBillDTO, EmailTemplates emailTemplate) throws IOException, MessagingException {
         Message message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress("bierkasse.sg@gmail.com", "Bierkasse S-G!"));
@@ -79,14 +79,14 @@ public class EmailService {
         BodyPart messageBodyPart = new MimeBodyPart();
         Path path = Path.of(emailTemplate.pathToFile);
         String someHtmlMessage = Files.readString(path);
-        someHtmlMessage = replaceHtmlTemplateVariables(someHtmlMessage, personDTO, billDTO);
+        someHtmlMessage = replaceHtmlTemplateVariables(someHtmlMessage, personDTO, beerBillDTO);
         messageBodyPart.setContent(someHtmlMessage, "text/html; charset=utf-8");
         multipart.addBodyPart(messageBodyPart);
 
         attachPicture(multipart, "sg-wappen", "resources/images/image-2.png");
         attachPicture(multipart, "paypal", "resources/images/image-1.png");
 
-        if (emailTemplate == EmailTemplates.BERICHT) {
+        if (emailTemplate == EmailTemplates.BIERKASSE_BERICHT) {
             attachPicture(multipart, "bierkassenbericht", "./Bierkassenbericht.pdf");
         }
 
@@ -103,29 +103,29 @@ public class EmailService {
         multipart.addBodyPart(messageBodyPart);
     }
 
-    public Map<String, String> getMailTemplateVariables(PersonDTO personDTO, BillDTO billDTO) {
+    public Map<String, String> getMailTemplateVariables(PersonDTO personDTO, BeerBillDTO beerBillDTO) {
         Map<String, String> variables = getPersonMailTemplateVariables(personDTO);
 
-        if (billDTO != null) {
-            variables.put("red-count", String.valueOf(billDTO.red()));
-            variables.put("blue-count", String.valueOf(billDTO.blue()));
-            variables.put("white-count", String.valueOf(billDTO.white()));
-            variables.put("green-count", String.valueOf(billDTO.green()));
+        if (beerBillDTO != null) {
+            variables.put("red-count", String.valueOf(beerBillDTO.red()));
+            variables.put("blue-count", String.valueOf(beerBillDTO.blue()));
+            variables.put("white-count", String.valueOf(beerBillDTO.white()));
+            variables.put("green-count", String.valueOf(beerBillDTO.green()));
         }
 
-        variables.put("blue-price", formatDoubleToEuro(BillDTO.BLUE_VALUE));
-        variables.put("red-price", formatDoubleToEuro(BillDTO.RED_VALUE));
-        variables.put("white-price", formatDoubleToEuro(BillDTO.WHITE_VALUE));
+        variables.put("blue-price", formatDoubleToEuro(BeerBillDTO.BLUE_VALUE));
+        variables.put("red-price", formatDoubleToEuro(BeerBillDTO.RED_VALUE));
+        variables.put("white-price", formatDoubleToEuro(BeerBillDTO.WHITE_VALUE));
 
-        if (billDTO != null) {
-            variables.put("green-price", formatDoubleToEuro(billDTO.greenValue()));
+        if (beerBillDTO != null) {
+            variables.put("green-price", formatDoubleToEuro(beerBillDTO.greenValue()));
 
-            variables.put("blue-subtotal", formatDoubleToEuro(billDTO.blue() * BillDTO.BLUE_VALUE));
-            variables.put("red-subtotal", formatDoubleToEuro(billDTO.red() * BillDTO.RED_VALUE));
-            variables.put("white-subtotal", formatDoubleToEuro(billDTO.white() * BillDTO.WHITE_VALUE));
-            variables.put("green-subtotal", formatDoubleToEuro(billDTO.green() * billDTO.greenValue()));
-            variables.put("sum", formatDoubleToEuro(Math.abs(billDTO.value())));
-            variables.put("ring-green-text", billDTO.greenText());
+            variables.put("blue-subtotal", formatDoubleToEuro(beerBillDTO.blue() * BeerBillDTO.BLUE_VALUE));
+            variables.put("red-subtotal", formatDoubleToEuro(beerBillDTO.red() * BeerBillDTO.RED_VALUE));
+            variables.put("white-subtotal", formatDoubleToEuro(beerBillDTO.white() * BeerBillDTO.WHITE_VALUE));
+            variables.put("green-subtotal", formatDoubleToEuro(beerBillDTO.green() * beerBillDTO.greenValue()));
+            variables.put("sum", formatDoubleToEuro(Math.abs(beerBillDTO.value())));
+            variables.put("ring-green-text", beerBillDTO.greenText());
         }
 
         variables.put("payment-link", link);
@@ -141,8 +141,8 @@ public class EmailService {
         return variables;
     }
 
-    public String replaceHtmlTemplateVariables(String someHtmlMessage, PersonDTO personDTO, BillDTO billDTO) {
-        Map<String, String> variables = getMailTemplateVariables(personDTO, billDTO);
+    public String replaceHtmlTemplateVariables(String someHtmlMessage, PersonDTO personDTO, BeerBillDTO beerBillDTO) {
+        Map<String, String> variables = getMailTemplateVariables(personDTO, beerBillDTO);
 
         for (String key : variables.keySet()) {
             String nextkey = "${" + key + "}";

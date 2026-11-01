@@ -21,7 +21,7 @@ import jakarta.annotation.security.RolesAllowed;
         themeFor = "vaadin-grid",
         value = "views.css"
 )
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class BillOverview extends Composite<VerticalLayout> {
 
     public BillOverview(PersonService personService) {

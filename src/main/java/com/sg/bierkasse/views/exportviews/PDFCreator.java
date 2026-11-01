@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @PageTitle("Bierkassenbericht")
 @Route(value = "export", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class PDFCreator extends Composite<VerticalLayout> {
 
     private final PersonService personService;
@@ -130,13 +130,13 @@ public class PDFCreator extends Composite<VerticalLayout> {
                                     .show("Neue Abrechnungperiode wurde definiert!");
                             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                         }
-                        personService.sendBerichtToRelevant();
+                        personService.sendBierkassenBerichtToRelevant();
                         Notification notification = Notification
                                 .show("Bericht wurde versendet!");
                         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     });
                 } else {
-                    personService.sendBerichtToTest();
+                    personService.sendBierkassenBerichtToTest();
                     Notification notification = Notification
                             .show("ONLY TEST SENT TO RECEIVER!");
                     notification.addThemeVariants(NotificationVariant.LUMO_WARNING);

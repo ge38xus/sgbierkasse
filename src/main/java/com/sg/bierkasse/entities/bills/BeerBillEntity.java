@@ -1,11 +1,11 @@
-package com.sg.bierkasse.entities;
+package com.sg.bierkasse.entities.bills;
 
 import org.bson.types.ObjectId;
 
 import java.util.Date;
 import java.util.Objects;
 
-public class BillEntity {
+public class BeerBillEntity {
 
     private ObjectId id;
     private int red;
@@ -16,11 +16,11 @@ public class BillEntity {
     private Date date;
     private String descr;
 
-    public BillEntity() {
+    public BeerBillEntity() {
 
     }
 
-    public BillEntity(int red, int blue, int white, int green, double value, Date date, String descr) {
+    public BeerBillEntity(int red, int blue, int white, int green, double value, Date date, String descr) {
         this.red = red;
         this.blue = blue;
         this.white = white;
@@ -82,7 +82,7 @@ public class BillEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BillEntity that = (BillEntity) o;
+        BeerBillEntity that = (BeerBillEntity) o;
         return red == that.red && blue == that.blue && white == that.white && green == that.green && value == that.value;
     }
 

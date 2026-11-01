@@ -3,6 +3,8 @@ package com.sg.bierkasse.dtos;
 import com.sg.bierkasse.entities.PersonEntity;
 import com.sg.bierkasse.utils.UserState;
 import com.sg.bierkasse.utils.helpers.FormatUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.util.Comparator;
@@ -12,14 +14,26 @@ import java.util.function.ToIntFunction;
 
 
 public class PersonDTO {
+        @Setter
+        @Getter
         String id;
+        @Getter
         String firstName;
+        @Getter
         String lastName;
+        @Setter
+        @Getter
         String email;
+        @Setter
+        @Getter
         String state;
-        List<BillDTO> bills;
+        @Getter
+        List<BeerBillDTO> bills;
+        @Getter
         List<RechnungDTO> invoices;
+        @Getter
         List<SpendeDTO> spenden;
+        @Getter
         boolean excelRelevant;
         boolean berichtReceiver;
 
@@ -29,14 +43,14 @@ public class PersonDTO {
         this.lastName = p.getLastName();
         this.email = p.getEmail();
         this.state = p.getState();
-        this.bills = p.getBillEntities().stream().map(BillDTO::new).toList();
+        this.bills = p.getBillEntities().stream().map(BeerBillDTO::new).toList();
         this.invoices = p.getRechnungEntities().stream().map(RechnungDTO::new).toList();
         this.spenden = p.getSpendeEntities().stream().map(SpendeDTO::new).toList();
         this.excelRelevant = p.isExcelRelevant();
         this.berichtReceiver = p.isBerichtReceiver();
     }
 
-    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BillDTO> bills, List<RechnungDTO> invoices, List<SpendeDTO> spenden, Boolean excelRelevant, Boolean berichtReceiver) {
+    public PersonDTO(String id, String firstName, String lastName, String email, String state, List<BeerBillDTO> bills, List<RechnungDTO> invoices, List<SpendeDTO> spenden, Boolean excelRelevant, Boolean berichtReceiver) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -49,62 +63,14 @@ public class PersonDTO {
         this.berichtReceiver = berichtReceiver;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public List<BillDTO> getBills() {
-        return bills;
-    }
-
-    public List<RechnungDTO> getInvoices() {
-        return invoices;
-    }
-
-    public boolean isExcelRelevant() {
-        return excelRelevant;
-    }
-
-    public List<SpendeDTO> getSpenden() {
-        return spenden;
-    }
-
-    public boolean isBerichtReceiver() {
+    public boolean isBierkassenBerichtReceiver() {
         return berichtReceiver;
     }
 
     public PersonEntity toPersonEntity() {
         ObjectId _id = id == null ? new ObjectId() : new ObjectId(id);
         return new PersonEntity(_id, firstName, lastName, email, state,
-                bills.stream().map(BillDTO::toBillEntity).toList(),
+                bills.stream().map(BeerBillDTO::toBillEntity).toList(),
                 invoices.stream().map(RechnungDTO::toRechnungEntity).toList(),
                 spenden.stream().map(SpendeDTO::toSpendeEntity).toList(),
                 excelRelevant, berichtReceiver
@@ -113,14 +79,14 @@ public class PersonDTO {
 
     public double getBalance() {
         if (bills != null && !bills.isEmpty()) {
-            return bills.stream().mapToDouble(BillDTO::value).sum();
+            return bills.stream().mapToDouble(BeerBillDTO::value).sum();
         }
         return 0.0;
     }
 
     public double getBalanceUpToDate(Date date) {
         if (bills != null && !bills.isEmpty()) {
-            return bills.stream().filter(b -> b.date().compareTo(date) <= 0).mapToDouble(BillDTO::value).sum();
+            return bills.stream().filter(b -> b.date().compareTo(date) <= 0).mapToDouble(BeerBillDTO::value).sum();
         }
         return 0.0;
     }
@@ -139,8 +105,8 @@ public class PersonDTO {
         if (bills != null && !bills.isEmpty()) {
             return bills.stream()
                     .filter(o -> (o.value() > 0))
-                    .sorted(Comparator.comparing(BillDTO::date).reversed())
-                    .map(BillDTO::date)
+                    .sorted(Comparator.comparing(BeerBillDTO::date).reversed())
+                    .map(BeerBillDTO::date)
                     .map(FormatUtils::formatDateToDisplay)
                     .findFirst().orElse(" - ");
         }
@@ -163,7 +129,7 @@ public class PersonDTO {
         return " - ";
     }
 
-    public int getNoOfXSince(Date conventDate, ToIntFunction<BillDTO> billDTOToIntFunction) {
+    public int getNoOfXSince(Date conventDate, ToIntFunction<BeerBillDTO> billDTOToIntFunction) {
         return this.getBills().stream()
                 .filter(billDTO -> billDTO.date().after(conventDate))
                 .mapToInt(billDTOToIntFunction)

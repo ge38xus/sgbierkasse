@@ -12,6 +12,7 @@ import com.sg.bierkasse.views.overviews.SpendeView;
 import com.sg.bierkasse.views.usermanagement.EditNutzerView;
 import com.sg.bierkasse.views.usermanagement.NeueNutzerView;
 import com.sg.bierkasse.views.overviews.Overview;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
@@ -26,17 +28,25 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.awt.*;
+import java.util.stream.Collectors;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
 
+	private final UserDetails userDetails;
 	private H2 viewTitle;
 	private final SecurityService securityService;
 
 	public MainLayout(@Autowired SecurityService securityService) {
 		this.securityService = securityService;
+		userDetails = securityService.getAuthenticatedUser();
+
 		setPrimarySection(Section.DRAWER);
 		addDrawerContent();
 		addHeaderContent();
@@ -50,22 +60,25 @@ public class MainLayout extends AppLayout {
 		viewTitle.addClassNames(LumoUtility.FontSize.MEDIUM, LumoUtility.Margin.NONE);
 
 		HorizontalLayout header;
-		if (securityService.getAuthenticatedUser() != null) {
+		if (userDetails != null) {
 			Button logout = new Button("Logout", click ->
 					securityService.logout());
-			header = new HorizontalLayout(logout);
+			Text roles = new Text(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")));
+			header = new HorizontalLayout();
+			header.add(roles);
+			header.add(logout);
+			header.setWidthFull();
+			header.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 		} else {
 			header = new HorizontalLayout();
 		}
-
-		// Other page components omitted.
 
 		addToNavbar(true, toggle, viewTitle);
 		addToNavbar(header);
 	}
 
 	private void addDrawerContent() {
-		H1 appName = new H1("Bierkasse v2.0");
+		H1 appName = new H1("SG v2.0");
 		appName.addClassNames(LumoUtility.FontSize.MEDIUM, LumoUtility.Margin.NONE);
 		Header header = new Header(appName);
 
@@ -76,17 +89,23 @@ public class MainLayout extends AppLayout {
 
 	private SideNav createNavigation() {
 		SideNav nav = new SideNav();
+		if (userDetails.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_BIERKASSENWART"))) {
+			nav.addItem(new SideNavItem("Bierkonsum aufschreiben", AbrechnungView.class));
+			nav.addItem(new SideNavItem("Bierkassenstand", BierstandView.class));
+			nav.addItem(new SideNavItem("Einzahlung", EinzahlungView.class));
+			nav.addItem(new SideNavItem("Bierkassen Kontenstand", Overview.class));
+			nav.addItem(new SideNavItem("Bierkassen User", BillOverview.class));
 
-		nav.addItem(new SideNavItem("Abrechnung", AbrechnungView.class));
-		nav.addItem(new SideNavItem("Bierstand", BierstandView.class));
-		nav.addItem(new SideNavItem("Einzahlung", EinzahlungView.class));
+			nav.addItem(new SideNavItem("Rechnungen", RechnungView.class));
+			nav.addItem(new SideNavItem("Spenden", SpendeView.class));
+			nav.addItem(new SideNavItem("Bierkassen Bericht", PDFCreator.class));
+		} else if (userDetails.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals("ROLE_CCKASSENWART"))) {
+			nav.addItem(new SideNavItem("CCEinzahlung", EinzahlungView.class));
+		}
 		nav.addItem(new SideNavItem("Neue Nutzer", NeueNutzerView.class));
 		nav.addItem(new SideNavItem("Change Nutzer", EditNutzerView.class));
-		nav.addItem(new SideNavItem("Kassenstand", Overview.class));
-		nav.addItem(new SideNavItem("Konto", BillOverview.class));
-		nav.addItem(new SideNavItem("Rechnungen", RechnungView.class));
-		nav.addItem(new SideNavItem("Spenden", SpendeView.class));
-		nav.addItem(new SideNavItem("Bericht", PDFCreator.class));
 
 		return nav;
 	}

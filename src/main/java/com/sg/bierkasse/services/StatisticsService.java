@@ -1,11 +1,12 @@
 package com.sg.bierkasse.services;
 
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.dtos.ConventDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.dtos.RechnungDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
 import com.sg.bierkasse.utils.UserState;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class StatisticsService {
     public static final String SPENDEN_USER_ID = "662d79bc151104579194f5b0";
 
     private final PersonService personService;
+    @Getter
     private final ConventDTO lastConvent;
 
     public StatisticsService(PersonService personService, ConventService conventService) {
@@ -31,48 +33,44 @@ public class StatisticsService {
     }
 
     public double getInvoicesSum() {
-        return personService.getAllRechnungDTOs().stream()
+        return personService.getAllBierkassenRechnungDTOs().stream()
                 .filter(rechnungDTO -> rechnungDTO.date().after(lastConvent.date()))
                 .mapToDouble(RechnungDTO::value)
                 .sum();
     }
 
     public double getConsumptionSum() {
-        return Math.abs(personService.getAllBills().stream()
+        return Math.abs(personService.getAllBierkassenBills().stream()
                 .filter(billDTO -> billDTO.date().after(lastConvent.date()))
                 .filter(billDTO -> billDTO.value() < 0 && billDTO.isConsumptionBill())
-                .mapToDouble(BillDTO::value)
+                .mapToDouble(BeerBillDTO::value)
                 .sum());
     }
 
     public double getGuthabenInvoicesSum() {
-        return personService.getAllRechnungDTOs().stream()
+        return personService.getAllBierkassenRechnungDTOs().stream()
                 .filter(rechnungDTO -> rechnungDTO.date().after(lastConvent.date()) && !rechnungDTO.privateMoneyUsed())
                 .mapToDouble(RechnungDTO::value)
                 .sum();
     }
 
     public double getMoneyInSum() {
-        double positiveChangesOnUserAccountsSum = personService.getAllBills().stream()
+        double positiveChangesOnUserAccountsSum = personService.getAllBierkassenBills().stream()
                 .filter(billDTO -> billDTO.date().after(lastConvent.date()))
                 .filter(billDTO -> billDTO.value() > 0)
-                .mapToDouble(BillDTO::value)
+                .mapToDouble(BeerBillDTO::value)
                 .sum();
         double positiveInvoiceChangesOnUserAccountsSum = this.getGuthabenInvoicesSum();
         return positiveChangesOnUserAccountsSum - positiveInvoiceChangesOnUserAccountsSum;
     }
 
-    public List<PersonDTORankingWrapper> getXKings(ToIntFunction<BillDTO> toIntFunction) {
+    public List<PersonDTORankingWrapper> getXKings(ToIntFunction<BeerBillDTO> toIntFunction) {
         return personService.findAll().stream()
                 .filter(personDTO -> !personDTO.getState().contentEquals(UserState.S.name))
                 .map(personDTO -> new PersonDTORankingWrapper(personDTO, personDTO.getNoOfXSince(lastConvent.date(), toIntFunction)))
                 .sorted(Comparator.comparing(PersonDTORankingWrapper::getCounter).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
-    }
-
-    public ConventDTO getLastConvent() {
-        return lastConvent;
     }
 
     public double calculateAllMinusActiveAccounts() {

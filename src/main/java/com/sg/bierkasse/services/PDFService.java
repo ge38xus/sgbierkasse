@@ -6,7 +6,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.sg.bierkasse.dtos.BierstandDTO;
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.dtos.PersonDTO;
 import com.sg.bierkasse.utils.PersonDTORankingWrapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -148,9 +148,9 @@ public class PDFService {
 
     private PdfPTable generateRanking() {
         PdfPTable table = getPdfTableWithHeader(RANKING_HEADERS);
-        List<PersonDTORankingWrapper> blueKings = statisticsService.getXKings(BillDTO::blue);
-        List<PersonDTORankingWrapper> redKings = statisticsService.getXKings(BillDTO::red);
-        List<PersonDTORankingWrapper> whiteKings = statisticsService.getXKings(BillDTO::white);
+        List<PersonDTORankingWrapper> blueKings = statisticsService.getXKings(BeerBillDTO::blue);
+        List<PersonDTORankingWrapper> redKings = statisticsService.getXKings(BeerBillDTO::red);
+        List<PersonDTORankingWrapper> whiteKings = statisticsService.getXKings(BeerBillDTO::white);
 
         for (int place = 0; place < 3; place++) {
             table.addCell(generateRankCell(blueKings.get(place), place + 1));

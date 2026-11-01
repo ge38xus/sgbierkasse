@@ -24,12 +24,12 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
 
-import static com.sg.bierkasse.dtos.BillDTO.*;
+import static com.sg.bierkasse.dtos.BeerBillDTO.*;
 
 @PageTitle("Bierkeller Stand")
 @Route(value = "/bierkellerstand", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class BierstandView extends Composite<VerticalLayout> {
 
     private final MyDatePicker datePicker = new MyDatePicker("Datum");

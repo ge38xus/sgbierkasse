@@ -1,6 +1,6 @@
 package com.sg.bierkasse.views.billentries;
 
-import com.sg.bierkasse.dtos.BillDTO;
+import com.sg.bierkasse.dtos.BeerBillDTO;
 import com.sg.bierkasse.services.PersonService;
 import com.sg.bierkasse.utils.EmailTemplates;
 import com.sg.bierkasse.views.MainLayout;
@@ -32,13 +32,13 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.sg.bierkasse.dtos.BillDTO.*;
+import static com.sg.bierkasse.dtos.BeerBillDTO.*;
 import static com.sg.bierkasse.utils.helpers.UIUtils.createHorizontalRowLayout;
 
 @PageTitle("Abrechnung")
 @Route(value = "/count", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class AbrechnungView extends Composite<VerticalLayout> {
 
     private final UserComboBox userComboBox;
@@ -137,8 +137,8 @@ public class AbrechnungView extends Composite<VerticalLayout> {
 
     private void saveAndResetForm() {
         try {
-            BillDTO billDTO = createBillDTO();
-            personService.pushBill(userComboBox.getSelected(), billDTO, EmailTemplates.DRINKS_OVERVIEW, benachrichtigungCheckbox.getValue());
+            BeerBillDTO beerBillDTO = createBillDTO();
+            personService.pushBeerBill(userComboBox.getSelected(), beerBillDTO, EmailTemplates.BIERKASSE_DRINKS_OVERVIEW, benachrichtigungCheckbox.getValue());
 
             userComboBox.reset();
             blue.setValue(0);
@@ -162,7 +162,7 @@ public class AbrechnungView extends Composite<VerticalLayout> {
                 green.getIntValue() * greenValue.getValue();
     }
 
-    public BillDTO createBillDTO() {
-        return new BillDTO(red.getIntValue(), blue.getIntValue(), white.getIntValue(), green.getIntValue(), greenValue.getValue(), textField.getValue(), -calculateValue(), new Date(), description.getValue());
+    public BeerBillDTO createBillDTO() {
+        return new BeerBillDTO(red.getIntValue(), blue.getIntValue(), white.getIntValue(), green.getIntValue(), greenValue.getValue(), textField.getValue(), -calculateValue(), new Date(), description.getValue());
     }
 }

@@ -32,7 +32,7 @@ import java.util.Locale;
 @PageTitle("Spenden")
 @Route(value = "spenden", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed("ADMIN")
+@RolesAllowed("BIERKASSENWART")
 public class SpendeView extends Composite<VerticalLayout> {
 
     PersonService personService;
